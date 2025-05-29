@@ -1,10 +1,10 @@
 const User = require('../models/User');
 
 exports.createSubscription = async (req, res) => {
-  const { operatorId } = req.body;
+  const { destination, price, tourId } = req.body;
 
-  if (!operatorId) {
-    return res.status(400).json({ message: 'Operator ID is required' });
+  if (!tourId) {
+    return res.status(400).json({ message: 'Tour ID is required' });
   }
 
   const user = await User.findById(req.user._id);
@@ -13,11 +13,11 @@ exports.createSubscription = async (req, res) => {
     return res.status(403).json({ message: 'Only agents can subscribe' });
   }
 
-  if (user.subscriptions.includes(operatorId)) {
+  if (user.subscriptions.find((value) => value.tourId === tourId)) {
     return res.status(400).json({ message: 'Already subscribed' });
   }
 
-  user.subscriptions.push(operatorId);
+  user.subscriptions.push({tourId, destination, price });
   await user.save();
 
   res.status(201).json({ message: 'Subscribed successfully', subscriptions: user.subscriptions });
@@ -25,13 +25,15 @@ exports.createSubscription = async (req, res) => {
 
 // Відписатися
 exports.deleteSubscription = async (req, res) => {
-  const { operatorId } = req.params;
+  const { id } = req.params;
 
   try {
     const agent = await User.findById(req.user._id);
 
     agent.subscriptions = agent.subscriptions.filter(
-      (id) => id.toString() !== operatorId
+      ({_id}) => {
+        return _id.toString() !== id
+      }
     );
 
     await agent.save();

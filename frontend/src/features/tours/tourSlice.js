@@ -1,10 +1,10 @@
 // src/features/tours/tourSlice.js (приклад з tours)
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { fetchTours as apiFetchTours, createTour, deleteTour } from '../../api/tourService';
+import { createTour, deleteTour, getTours } from '../../api/tourService';
 
 export const fetchTours = createAsyncThunk('tours/fetchTours', async () => {
-  const res = await apiFetchTours();
-  return res.data.tours;
+  const res = await getTours();
+  return res.data;
 });
 
 export const addTour = createAsyncThunk('tours/addTour', async (tourData) => {
@@ -20,7 +20,12 @@ export const removeTour = createAsyncThunk('tours/removeTour', async (tourId) =>
 const tourSlice = createSlice({
   name: 'tours',
   initialState: { tours: [], loading: false, error: null },
-  reducers: {},
+  reducers: {
+    setTours: (state, action) => {
+      state.tours = action.payload;
+    },
+    clearTours: (state) => state.tours = []
+  },
   extraReducers: builder => {
     builder
       .addCase(fetchTours.pending, (state) => { state.loading = true; state.error = null; })
@@ -35,4 +40,5 @@ const tourSlice = createSlice({
   }
 });
 
+export const { setTours, clearTours } = tourSlice.actions;
 export default tourSlice.reducer;

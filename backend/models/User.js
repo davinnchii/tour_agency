@@ -9,10 +9,10 @@ const userSchema = new mongoose.Schema({
 
   // Додаємо поле для підписок (тільки для agent)
   subscriptions: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User'
-  }],
-}, { timestamps: true });
+    tourId: { type: mongoose.Schema.Types.ObjectId, ref: 'Tour' },
+    destination: { type: String, required: true}, 
+    price: {type: Number, required: true}
+  }]}, { timestamps: true });
 
 // Хешування пароля перед збереженням
 userSchema.pre('save', async function (next) {

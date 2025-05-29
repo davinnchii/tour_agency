@@ -27,7 +27,7 @@ const LoginPage = () => {
             dispatch(loginSuccess({ token, user }));
 
             // ✅ редірект на дашборд
-            navigate(`/dashboard/${user.role}`);
+            navigate('/dashboard');
         } catch (err) {
             console.error(err);
             setError('Невірна пошта або пароль');

@@ -1,10 +1,10 @@
 const User = require('../models/User');
 
 exports.createSubscription = async (req, res) => {
-  const { destination, price, tourId } = req.body;
+  const { destination, price, operatorId } = req.body;
 
-  if (!tourId) {
-    return res.status(400).json({ message: 'Tour ID is required' });
+  if (!operatorId) {
+    return res.status(400).json({ message: 'Operator ID is required' });
   }
 
   const user = await User.findById(req.user._id);
@@ -13,11 +13,14 @@ exports.createSubscription = async (req, res) => {
     return res.status(403).json({ message: 'Only agents can subscribe' });
   }
 
-  if (user.subscriptions.find((value) => value.tourId === tourId)) {
+  console.log(user);
+
+
+  if (user.subscriptions.find((value) => value.operatorId.toString() === operatorId)) {
     return res.status(400).json({ message: 'Already subscribed' });
   }
 
-  user.subscriptions.push({tourId, destination, price });
+  user.subscriptions.push({operatorId, destination, price });
   await user.save();
 
   res.status(201).json({ message: 'Subscribed successfully', subscriptions: user.subscriptions });

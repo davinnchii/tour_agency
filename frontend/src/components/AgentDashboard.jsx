@@ -10,11 +10,14 @@ import {
   addSubscription,
   removeSubscription,
 } from '../features/subscriptions/subscriptionSlice';
+import { addRequest, fetchRequests, removeRequest } from '../features/requests/requestsSlice';
 
 const AgentDashboard = () => {
   const dispatch = useDispatch();
   const tours = useSelector((state) => state.tours.tours);
+  const user = useSelector((state) => state.auth.user)
   const subscriptions = useSelector((state) => state.subscriptions.subscriptions);
+  const { requests, loaded } = useSelector(state => state.requests);
 
   const [showSubs, setShowSubs] = useState(false);
 
@@ -44,6 +47,47 @@ const AgentDashboard = () => {
     }
   };
 
+  const handleFetchRequests = async () => {
+    if (showSubs) {
+      setShowSubs(false);
+      return;
+    }
+
+    if (!loaded) {
+      try {
+        await dispatch(fetchRequests()).unwrap();
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    setShowSubs(true);
+  }
+
+  const handleCreateRequest = async (tour) => {
+    const data = {
+      tour: tour._id,
+      customerName: user.name,
+      customerEmail: user.email,
+    }
+
+    try {
+      await dispatch(addRequest(data)).unwrap();
+      await dispatch(fetchRequests()).unwrap();
+    } catch (err) {
+      console.error('Something went wrong', err, tour)
+    }
+  }
+
+  const handleDeleteRequest = async (id) => {
+    try {
+      await dispatch(removeRequest(id)).unwrap();
+      await dispatch(fetchRequests()).unwrap;
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
   const handleFetchSubscriptions = async () => {
     try {
       await dispatch(fetchSubscriptions()).unwrap();
@@ -71,17 +115,8 @@ const AgentDashboard = () => {
         <button className="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600 transition" onClick={handleFetchTours}>
           Переглянути тури
         </button>
-        <button className="w-full bg-purple-500 text-white py-2 rounded hover:bg-purple-600 transition" onClick={handleFetchSubscriptions}>
+        <button className="w-full bg-purple-500 text-white py-2 rounded hover:bg-purple-600 transition" onClick={handleFetchRequests}>
           {showSubs ? 'Сховати заявки' : 'Переглянути заявки'}
-        </button>
-        <button className="w-full bg-green-500 text-white py-2 rounded hover:bg-green-600 transition" onClick={async () => {
-          const destination = prompt('Куди?');
-          const price = prompt('Макс. ціна?');
-          if (destination && price) {
-            await handleSubscribe({ country: destination, price: Number(price) });
-          }
-        }}>
-          Створити заявку вручну
         </button>
       </div>
 
@@ -97,10 +132,10 @@ const AgentDashboard = () => {
                   <p className="text-sm text-gray-600">{tour.country}, {tour.price} грн</p>
                 </div>
                 <button
-                  onClick={() => handleSubscribe(tour)}
+                  onClick={() => handleCreateRequest(tour)}
                   className="text-sm bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
                 >
-                  Підписатися
+                  Подати заявку
                 </button>
               </li>
             ))}
@@ -112,18 +147,18 @@ const AgentDashboard = () => {
       {showSubs && (
         <div>
           <h3 className="text-lg font-bold mb-2">Ваші заявки</h3>
-          {subscriptions.length === 0 ? (
+          {requests.length === 0 ? (
             <p>Немає заявок</p>
           ) : (
             <ul className="space-y-2">
-              {subscriptions.map((sub) => (
-                <li key={sub._id} className="border p-3 rounded flex justify-between items-center">
+              {requests.map((req) => (
+                <li key={req._id} className="border p-3 rounded flex justify-between items-center">
                   <div>
-                    <p><strong>Напрямок:</strong> {sub.destination}</p>
-                    <p><strong>Ціна:</strong> {sub.price} грн</p>
+                    <p><strong>Напрямок:</strong> {req.tour.country}</p>
+                    <p><strong>Ціна:</strong> {req.tour.price} грн</p>
                   </div>
                   <button
-                    onClick={() => handleDeleteSubscription(sub._id)}
+                    onClick={() => handleDeleteRequest(req._id)}
                     className="text-sm bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
                   >
                     Видалити

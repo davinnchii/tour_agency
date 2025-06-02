@@ -5,7 +5,7 @@ import {
   getSubscriptions,
   createSubscription,
   deleteSubscription,
-} from '../../api/tourService';
+} from '../../api/subscriptionService';
 
 export const fetchSubscriptions = createAsyncThunk(
   'subscriptions/fetchSubscriptions',

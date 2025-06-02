@@ -2,7 +2,7 @@
 import React from 'react';
 import { useDispatch } from 'react-redux';
 import { addTour, removeTour } from '../features/tours/tourSlice';
-import { getSubscriptions } from '../api/tourService';
+import { getRequests } from '../api/requestService';
 
 const OperatorDashboard = () => {
   const dispatch = useDispatch();
@@ -38,7 +38,7 @@ const OperatorDashboard = () => {
 
   const handleFetchSubscriptions = async () => {
     try {
-      const res = await getSubscriptions();
+      const res = await getRequests();
       alert(`Підписок: ${res.data.length}`);
       console.log('Subscriptions:', res.data);
     } catch (err) {

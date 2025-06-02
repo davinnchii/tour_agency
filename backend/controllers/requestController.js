@@ -15,7 +15,7 @@ exports.getRequests = async (req, res) => {
     }
 
     const requests = await Request.find(filter)
-      .populate('tour', 'title country')
+      .populate('tour', 'title country price')
       .populate('createdBy', 'name email')
       .sort({ createdAt: -1 });
 
@@ -91,20 +91,23 @@ exports.createRequest = async (req, res) => {
 // Видалення заявки (тільки оператор)
 exports.deleteRequest = async (req, res) => {
   try {
-    if (req.user.role !== 'operator') {
-      return res.status(403).json({ message: 'Доступ заборонено' });
-    }
-
     const request = await Request.findById(req.params.id);
 
     if (!request) {
       return res.status(404).json({ message: 'Заявка не знайдена' });
     }
 
-    // Перевірка, що оператор є власником заявки через тур
-    const tour = await Tour.findById(request.tour);
-    if (!tour || tour.operator.toString() !== req.user._id.toString()) {
-      return res.status(403).json({ message: 'Доступ заборонено' });
+    if (req.user.role == 'operator') {
+      const tour = await Tour.findById(request.tour);
+      if (!tour || tour.operator.toString() !== req.user._id.toString()) {
+        return res.status(403).json({ message: 'Доступ заборонено' });
+      }
+    }
+
+    if (req.user.role == 'agent') {
+      if (request.agency.toString() !== req.user._id.toString()) {
+        return res.status(403).json({ message: 'Доступ заборонено' });
+      }
     }
 
     await Request.findByIdAndDelete(req.params.id);

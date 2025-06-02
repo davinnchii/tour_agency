@@ -14,6 +14,6 @@ router.route('/')
 
 router.route('/:id')
   .get(protect, getRequestById)
-  .delete(protect, authorizeRoles('operator'), deleteRequest);
+  .delete(protect, deleteRequest);
 
 module.exports = router;

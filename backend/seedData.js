@@ -25,7 +25,8 @@ async function seedData() {
       name: 'Agent One',
       email: 'agent@example.com',
       password: '123456',
-      role: 'agent'
+      role: 'agent',
+      subscriptions: []
     });
 
     const tour1 = await Tour.create({

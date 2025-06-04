@@ -21,15 +21,12 @@ const tourSlice = createSlice({
   name: 'tours',
   initialState: { tours: [], loading: false, error: null },
   reducers: {
-    setTours: (state, action) => {
-      state.tours = action.payload;
-    },
     clearTours: (state) => state.tours = []
   },
   extraReducers: builder => {
     builder
       .addCase(fetchTours.pending, (state) => { state.loading = true; state.error = null; })
-      .addCase(fetchTours.fulfilled, (state, action) => { state.loading = false; state.tours = action.payload; })
+      .addCase(fetchTours.fulfilled, (state, action) => { state.loading = false; state.tours = action.payload.tours; state.loading = true; })
       .addCase(fetchTours.rejected, (state, action) => { state.loading = false; state.error = action.error.message; })
 
       .addCase(addTour.fulfilled, (state, action) => { state.tours.push(action.payload); })
@@ -40,5 +37,5 @@ const tourSlice = createSlice({
   }
 });
 
-export const { setTours, clearTours } = tourSlice.actions;
+export const { clearTours } = tourSlice.actions;
 export default tourSlice.reducer;

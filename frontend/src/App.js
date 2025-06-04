@@ -5,6 +5,7 @@ import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import ProtectedRoute from './components/ProtectedRoute';
 import DashboardPage from './pages/DashboardPage';
+import LanguageSwitcher from './components/LanguageSwitcher';
 
 
 const App = () => {
@@ -20,6 +21,7 @@ const App = () => {
           </ProtectedRoute>
         } />
       </Routes>
+        <LanguageSwitcher />
     </Router>
   );
 };

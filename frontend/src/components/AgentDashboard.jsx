@@ -1,4 +1,3 @@
-// src/components/AgentDashboard.jsx
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchTours } from "../features/tours/tourSlice";
@@ -13,8 +12,10 @@ import {
   removeRequest,
 } from "../features/requests/requestsSlice";
 import { getOperators } from "../features/users/userSlice";
+import { useTranslation } from "react-i18next";
 
 const AgentDashboard = () => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const tours = useSelector((state) => state.tours.tours);
   const user = useSelector((state) => state.auth.user);
@@ -34,15 +35,15 @@ const AgentDashboard = () => {
 
   const handleSubscribe = async (operator) => {
     const data = {
-      operatorId: operator._id
+      operatorId: operator._id,
     };
     try {
       await dispatch(addSubscription(data)).unwrap();
       await dispatch(fetchSubscriptions()).unwrap();
-      alert("Підписка створена");
+      alert(t("agentDashboard.subscriptionCreated"));
     } catch (err) {
-      console.error("Помилка створення підписки", err);
-      alert("Не вдалося створити підписку");
+      console.error(t("agentDashboard.subscriptionCreateError"), err);
+      alert(t("agentDashboard.subscriptionCreateErrorAlert"));
     }
   };
 
@@ -73,40 +74,39 @@ const AgentDashboard = () => {
     try {
       await dispatch(addRequest(data)).unwrap();
       await dispatch(fetchRequests()).unwrap();
-      alert('Заявку додано');
+      alert(t("agentDashboard.requestAdded"));
     } catch (err) {
       console.error(err);
-      alert('Сталася помилка при подачі завки')
+      alert(t("agentDashboard.requestAddError"));
     }
   };
 
   const handleDeleteRequest = async (id) => {
     try {
       await dispatch(removeRequest(id)).unwrap();
-      await dispatch(fetchRequests()).unwrap;
-      alert('Заявку відкликано');
+      await dispatch(fetchRequests()).unwrap();
+      alert(t("agentDashboard.requestDeleted"));
     } catch (err) {
       console.error(err);
-      alert('Сталося помилка при відкликані заявки')
+      alert(t("agentDashboard.requestDeleteError"));
     }
   };
 
   const handleDeleteSubscription = async (id) => {
-    console.log(id);
     try {
       await dispatch(removeSubscription(id)).unwrap();
       await dispatch(fetchSubscriptions()).unwrap();
-      alert("Підписку видалено");
+      alert(t("agentDashboard.subscriptionDeleted"));
     } catch (err) {
-      console.error("Не вдалося видалити", err);
+      console.error(t("agentDashboard.subscriptionDeleteError"), err);
     }
   };
 
   return (
     <div>
-      <h3 className="text-lg font-semibold mb-2">Список туроператорів:</h3>
+      <h3 className="text-lg font-semibold mb-2">{t("agentDashboard.operatorList")}</h3>
       {loading ? (
-        <p>Завантаження...</p>
+        <p>{t("agentDashboard.loading")}</p>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
           {operators.map((op) => {
@@ -134,14 +134,14 @@ const AgentDashboard = () => {
                       }}
                       className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 text-sm"
                     >
-                      Відписатись
+                      {t("agentDashboard.unsubscribe")}
                     </button>
                   ) : (
                     <button
                       onClick={() => handleSubscribe(op)}
                       className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600 text-sm"
                     >
-                      Підписатись
+                      {t("agentDashboard.subscribe")}
                     </button>
                   )}
                 </div>
@@ -155,14 +155,16 @@ const AgentDashboard = () => {
           className="w-full bg-purple-500 text-white py-2 rounded hover:bg-purple-600 transition"
           onClick={handleFetchRequests}
         >
-          {showSubs ? "Сховати заявки" : "Переглянути заявки"}
+          {showSubs
+            ? t("agentDashboard.hideRequests")
+            : t("agentDashboard.showRequests")}
         </button>
       </div>
 
       {/* Перегляд турів */}
       {tours.length > 0 && (
         <div className="mb-6">
-          <h3 className="text-lg font-bold mb-2">Доступні тури</h3>
+          <h3 className="text-lg font-bold mb-2">{t("agentDashboard.availableTours")}</h3>
           <ul className="space-y-2">
             {tours.map((tour) => (
               <li
@@ -179,7 +181,7 @@ const AgentDashboard = () => {
                   onClick={() => handleCreateRequest(tour)}
                   className="text-sm bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
                 >
-                  Подати заявку
+                  {t("agentDashboard.submitRequest")}
                 </button>
               </li>
             ))}
@@ -190,9 +192,9 @@ const AgentDashboard = () => {
       {/* Dropdown для заявок */}
       {showSubs && (
         <div>
-          <h3 className="text-lg font-bold mb-2">Ваші заявки</h3>
+          <h3 className="text-lg font-bold mb-2">{t("agentDashboard.yourRequests")}</h3>
           {requests.length === 0 ? (
-            <p>Немає заявок</p>
+            <p>{t("agentDashboard.noRequests")}</p>
           ) : (
             <ul className="space-y-2">
               {requests.map((req) => (
@@ -202,17 +204,17 @@ const AgentDashboard = () => {
                 >
                   <div>
                     <p>
-                      <strong>Напрямок:</strong> {req.tour.country}
+                      <strong>{t("agentDashboard.destination")}:</strong> {req.tour.country}
                     </p>
                     <p>
-                      <strong>Ціна:</strong> {req.tour.price} грн
+                      <strong>{t("agentDashboard.price")}:</strong> {req.tour.price} грн
                     </p>
                   </div>
                   <button
                     onClick={() => handleDeleteRequest(req._id)}
                     className="text-sm bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
                   >
-                    Видалити
+                    {t("agentDashboard.delete")}
                   </button>
                 </li>
               ))}

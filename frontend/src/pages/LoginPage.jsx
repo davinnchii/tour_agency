@@ -4,8 +4,10 @@ import { loginSuccess } from '../features/auth/authSlice';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { API_URL } from '../utils/const';
+import { useTranslation } from 'react-i18next';
 
 const LoginPage = () => {
+    const { t } = useTranslation();
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
@@ -26,21 +28,20 @@ const LoginPage = () => {
 
             dispatch(loginSuccess({ token, user }));
 
-            // ✅ редірект на дашборд
             navigate('/dashboard');
         } catch (err) {
             console.error(err);
-            setError('Невірна пошта або пароль');
+            setError(t('login.errorInvalid'));
         }
     };
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
             <div className="bg-white p-8 rounded-xl shadow-lg w-full max-w-md">
-                <h2 className="text-2xl font-bold mb-6 text-center">Вхід у кабінет</h2>
+                <h2 className="text-2xl font-bold mb-6 text-center">{t('login.title')}</h2>
                 <form onSubmit={handleLogin}>
                     <div className="mb-4">
-                        <label className="block text-sm font-medium mb-1">Email</label>
+                        <label className="block text-sm font-medium mb-1">{t('login.email')}</label>
                         <input
                             type="email"
                             className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -51,7 +52,7 @@ const LoginPage = () => {
                     </div>
 
                     <div className="mb-4">
-                        <label className="block text-sm font-medium mb-1">Пароль</label>
+                        <label className="block text-sm font-medium mb-1">{t('login.password')}</label>
                         <input
                             type="password"
                             className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -67,16 +68,15 @@ const LoginPage = () => {
                         type="submit"
                         className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition duration-200"
                     >
-                        Увійти
+                        {t('login.button')}
                     </button>
                     <p className="text-sm mt-4 text-center">
-                        Ще не маєте акаунта?{' '}
+                        {t('login.noAccount')}{' '}
                         <Link to="/register" className="text-blue-600 hover:underline">
-                            Зареєструватися
+                            {t('login.register')}
                         </Link>
                     </p>
                 </form>
-
             </div>
         </div>
     );

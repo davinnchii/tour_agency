@@ -1,0 +1,98 @@
+{
+  "login": {
+    "title": "Login",
+    "email": "Email",
+    "password": "Password",
+    "button": "Sign In",
+    "noAccount": "Don't have an account?",
+    "register": "Register",
+    "errorInvalid": "Invalid email or password"
+  },
+  "register": {
+    "title": "Register",
+    "name": "Name",
+    "email": "Email",
+    "password": "Password",
+    "role": "Role",
+    "roleAgent": "Agent",
+    "roleOperator": "Operator",
+    "button": "Sign Up",
+    "haveAccount": "Already have an account?",
+    "login": "Sign In",
+    "errorDefault": "Registration error"
+  },
+  "dashboard": {
+    "welcome": "Welcome",
+    "logout": "Logout",
+    "role": "Your role",
+    "unknownRole": "Unknown role"
+  },
+  "agentDashboard": {
+    "operatorList": "List of tour operators:",
+    "loading": "Loading...",
+    "subscribe": "Subscribe",
+    "unsubscribe": "Unsubscribe",
+    "showRequests": "Show requests",
+    "hideRequests": "Hide requests",
+    "availableTours": "Available tours",
+    "submitRequest": "Submit request",
+    "yourRequests": "Your requests",
+    "noRequests": "No requests",
+    "destination": "Destination",
+    "price": "Price",
+    "delete": "Delete",
+    "subscriptionCreated": "Subscription created",
+    "subscriptionCreateError": "Error creating subscription",
+    "subscriptionCreateErrorAlert": "Failed to create subscription",
+    "requestAdded": "Request added",
+    "requestAddError": "Error submitting request",
+    "requestDeleted": "Request deleted",
+    "requestDeleteError": "Error deleting request",
+    "subscriptionDeleted": "Subscription deleted",
+    "subscriptionDeleteError": "Failed to delete subscription"
+  },
+  "operatorDashboard": {
+    "dashboardTitle": "Operator Dashboard",
+    "createTour": "Create New Tour",
+    "showRequests": "Show Requests",
+    "hideRequests": "Hide Requests",
+    "yourTours": "Your Tours",
+    "deleteTour": "Delete Tour",
+    "requestsOnTours": "Requests on Your Tours",
+    "noRequests": "No Requests",
+    "client": "Client",
+    "tour": "Tour",
+    "email": "Email",
+    "delete": "Delete",
+    "tourDeleted": "Tour deleted",
+    "tourDeleteError": "Failed to delete tour",
+    "requestsLoadError": "Error loading requests",
+    "requestDeleted": "Request deleted",
+    "requestDeleteError": "Error deleting request"
+  },
+  "createTourForm": {
+    "title": "New Tour",
+    "placeholders": {
+      "title": "Tour Title",
+      "description": "Tour Description",
+      "country": "Select Country",
+      "price": "Price"
+    },
+    "errors": {
+      "titleRequired": "Title is required",
+      "descriptionRequired": "Description is required",
+      "countryRequired": "Please select a country",
+      "priceRequired": "Price is required",
+      "startDateRequired": "Start date is required",
+      "startDateMin": "Start date cannot be in the past",
+      "endDateRequired": "End date is required",
+      "endDateMin": "End date must be after start date"
+    },
+    "success": "Tour created successfully",
+    "error": "Error creating the tour",
+    "buttons": {
+      "create": "Create",
+      "cancel": "Cancel"
+    }
+  }
+}

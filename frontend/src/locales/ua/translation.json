@@ -1,0 +1,98 @@
+{
+  "login": {
+    "title": "Вхід у кабінет",
+    "email": "Email",
+    "password": "Пароль",
+    "button": "Увійти",
+    "noAccount": "Ще не маєте акаунта?",
+    "register": "Зареєструватися",
+    "errorInvalid": "Невірна пошта або пароль"
+  },
+  "register": {
+    "title": "Реєстрація",
+    "name": "Імʼя",
+    "email": "Email",
+    "password": "Пароль",
+    "role": "Роль",
+    "roleAgent": "Турагент",
+    "roleOperator": "Туроператор",
+    "button": "Зареєструватися",
+    "haveAccount": "Вже маєте акаунт?",
+    "login": "Увійти",
+    "errorDefault": "Помилка реєстрації"
+  },
+  "dashboard": {
+    "welcome": "Вітаємо",
+    "logout": "Вийти",
+    "role": "Ваша роль",
+    "unknownRole": "Невідома роль"
+  },
+  "agentDashboard": {
+    "operatorList": "Список туроператорів:",
+    "loading": "Завантаження...",
+    "subscribe": "Підписатись",
+    "unsubscribe": "Відписатись",
+    "showRequests": "Переглянути заявки",
+    "hideRequests": "Сховати заявки",
+    "availableTours": "Доступні тури",
+    "submitRequest": "Подати заявку",
+    "yourRequests": "Ваші заявки",
+    "noRequests": "Немає заявок",
+    "destination": "Напрямок",
+    "price": "Ціна",
+    "delete": "Видалити",
+    "subscriptionCreated": "Підписка створена",
+    "subscriptionCreateError": "Помилка створення підписки",
+    "subscriptionCreateErrorAlert": "Не вдалося створити підписку",
+    "requestAdded": "Заявку додано",
+    "requestAddError": "Сталася помилка при подачі завки",
+    "requestDeleted": "Заявку відкликано",
+    "requestDeleteError": "Сталося помилка при відкликані заявки",
+    "subscriptionDeleted": "Підписку видалено",
+    "subscriptionDeleteError": "Не вдалося видалити підписку"
+  },
+  "operatorDashboard": {
+    "dashboardTitle": "Панель керування оператором",
+    "createTour": "Створити новий тур",
+    "showRequests": "Переглянути заявки",
+    "hideRequests": "Сховати заявки",
+    "yourTours": "Ваші тури",
+    "deleteTour": "Видалити тур",
+    "requestsOnTours": "Заявки на ваші тури",
+    "noRequests": "Немає заявок",
+    "client": "Клієнт",
+    "tour": "Тур",
+    "email": "Email",
+    "delete": "Видалити",
+    "tourDeleted": "Тур видалено",
+    "tourDeleteError": "Не вдалося видалити тур",
+    "requestsLoadError": "Помилка завантаження заявок",
+    "requestDeleted": "Заявку видалено",
+    "requestDeleteError": "Сталася помилка при видаленні заявки"
+  },
+  "createTourForm": {
+    "title": "Новий тур",
+    "placeholders": {
+      "title": "Назва туру",
+      "description": "Опис туру",
+      "country": "Оберіть країну",
+      "price": "Ціна"
+    },
+    "errors": {
+      "titleRequired": "Назва обов’язкова",
+      "descriptionRequired": "Опис обов’язковий",
+      "countryRequired": "Оберіть країну",
+      "priceRequired": "Ціна обов’язкова",
+      "startDateRequired": "Дата початку обов'язкова",
+      "startDateMin": "Дата не може бути в минулому",
+      "endDateRequired": "Дата завершення обов'язкова",
+      "endDateMin": "Дата завершення має бути пізніше початку"
+    },
+    "success": "Тур створено успішно",
+    "error": "Помилка при створенні туру",
+    "buttons": {
+      "create": "Створити",
+      "cancel": "Скасувати"
+    }
+  }
+}

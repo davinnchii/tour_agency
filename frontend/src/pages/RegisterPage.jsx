@@ -4,8 +4,10 @@ import { useDispatch } from 'react-redux';
 import { loginSuccess } from '../features/auth/authSlice';
 import axios from 'axios';
 import { API_URL } from '../utils/const';
+import { useTranslation } from 'react-i18next';
 
 const RegisterPage = () => {
+    const { t } = useTranslation();
     const dispatch = useDispatch();
     const [formData, setFormData] = useState({
         name: '',
@@ -27,17 +29,17 @@ const RegisterPage = () => {
             dispatch(loginSuccess(res.data));
         } catch (err) {
             console.error(err);
-            setError(err.response?.data?.message || 'Помилка реєстрації');
+            setError(err.response?.data?.message || t('register.errorDefault'));
         }
     };
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
             <div className="bg-white p-8 rounded-xl shadow-lg w-full max-w-md">
-                <h2 className="text-2xl font-bold mb-6 text-center">Реєстрація</h2>
+                <h2 className="text-2xl font-bold mb-6 text-center">{t('register.title')}</h2>
                 <form onSubmit={handleRegister}>
                     <div className="mb-4">
-                        <label className="block text-sm font-medium mb-1">Імʼя</label>
+                        <label className="block text-sm font-medium mb-1">{t('register.name')}</label>
                         <input
                             type="text"
                             name="name"
@@ -49,7 +51,7 @@ const RegisterPage = () => {
                     </div>
 
                     <div className="mb-4">
-                        <label className="block text-sm font-medium mb-1">Email</label>
+                        <label className="block text-sm font-medium mb-1">{t('register.email')}</label>
                         <input
                             type="email"
                             name="email"
@@ -61,7 +63,7 @@ const RegisterPage = () => {
                     </div>
 
                     <div className="mb-4">
-                        <label className="block text-sm font-medium mb-1">Пароль</label>
+                        <label className="block text-sm font-medium mb-1">{t('register.password')}</label>
                         <input
                             type="password"
                             name="password"
@@ -73,15 +75,15 @@ const RegisterPage = () => {
                     </div>
 
                     <div className="mb-4">
-                        <label className="block text-sm font-medium mb-1">Роль</label>
+                        <label className="block text-sm font-medium mb-1">{t('register.role')}</label>
                         <select
                             name="role"
                             className="w-full px-4 py-2 border rounded-md"
                             value={formData.role}
                             onChange={handleChange}
                         >
-                            <option value="agent">Турагент</option>
-                            <option value="operator">Туроператор</option>
+                            <option value="agent">{t('register.roleAgent')}</option>
+                            <option value="operator">{t('register.roleOperator')}</option>
                         </select>
                     </div>
 
@@ -91,15 +93,14 @@ const RegisterPage = () => {
                         type="submit"
                         className="w-full bg-green-600 text-white py-2 rounded-md hover:bg-green-700 transition"
                     >
-                        Зареєструватися
+                        {t('register.button')}
                     </button>
                     <p className="text-sm mt-4 text-center">
-                        Вже маєте акаунт?{' '}
+                        {t('register.haveAccount')}{' '}
                         <Link to="/login" className="text-blue-600 hover:underline">
-                            Увійти
+                            {t('register.login')}
                         </Link>
                     </p>
-
                 </form>
             </div>
         </div>

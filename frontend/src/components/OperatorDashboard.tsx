@@ -1,78 +1,74 @@
 "use client"
 
-import type React from "react"
-import { useEffect, useState } from "react"
+import React from "react"
+import { useState, useCallback } from "react"
 import { useTranslation } from "react-i18next"
-import { useAppDispatch, useAppSelector } from "@/app/store"
-import { fetchTours } from "../features/tours/tourSlice"
-import { fetchRequests, removeRequest, updateRequestStatus } from "@/features/requests/requestsSlice"
+import { useAppDispatch, useAppSelector } from "../store"
+import { removeRequest, updateRequestStatus } from "@/features/requests/requestsSlice"
 import { toastSuccess, toastError, toastInfo } from "../utils/toast"
+import { useAppData, useLazyData } from "../hooks"
+import { selectOperatorRequests } from "../store/selectors"
 import { CreateTourForm } from "./CreateTourForm"
 import TourSearchResults from "@/components/TourSearchResult"
 import type { PopulatedRequest } from "../types"
 
-const OperatorDashboard: React.FC = () => {
+const OperatorDashboard: React.FC = React.memo(() => {
   const { t } = useTranslation()
   const dispatch = useAppDispatch()
+  const { loadRequests } = useLazyData()
 
   const user = useAppSelector((state) => state.auth.user)
-  const { requests, loaded, loading } = useAppSelector((state) => state.requests)
+  const operatorRequests = useAppSelector(selectOperatorRequests)
+  const { loading } = useAppSelector((state) => state.requests)
 
   const [activeTab, setActiveTab] = useState<"tours" | "requests" | "create">("tours")
-  const [showModal, setShowModal] = useState<boolean>(false)
 
-  useEffect(() => {
-    dispatch(fetchTours()).unwrap()
-  }, [dispatch])
+  // Initialize app data
+  useAppData()
 
-  const handleDeleteRequest = async (id: string): Promise<void> => {
-    try {
-      await dispatch(removeRequest(id)).unwrap()
-      toastSuccess(t("operatorDashboard.requestDeleted"))
-    } catch (err) {
-      console.error(err)
-      toastError(t("operatorDashboard.requestDeleteError"))
-    }
-  }
-
-  const handleUpdateRequestStatus = async (id: string, status: "pending" | "approved" | "rejected"): Promise<void> => {
-    try {
-      dispatch(updateRequestStatus({ id, status }));
-
-      const statusMessages = {
-        pending: t("operatorDashboard.requestStatusPending"),
-        approved: t("operatorDashboard.requestStatusApproved"),
-        rejected: t("operatorDashboard.requestStatusRejected"),
-      }
-
-      toastSuccess(statusMessages[status] || t("operatorDashboard.requestStatusUpdated"))
-    } catch (err) {
-      console.error(err)
-      toastError(t("operatorDashboard.requestStatusUpdateError"))
-    }
-  }
-
-  const handleFetchRequests = async (): Promise<void> => {
-    if (!loaded) {
+  const handleDeleteRequest = useCallback(
+    async (id: string) => {
       try {
-        await dispatch(fetchRequests()).unwrap()
+        await dispatch(removeRequest(id)).unwrap()
+        toastSuccess(t("operatorDashboard.requestDeleted"))
       } catch (err) {
-        console.error(t("operatorDashboard.requestsLoadError"), err)
-        toastError(t("operatorDashboard.requestsLoadError"))
+        console.error(err)
+        toastError(t("operatorDashboard.requestDeleteError"))
       }
-    }
-  }
+    },
+    [dispatch, t],
+  )
 
-  const handleCloseModal = async (): Promise<void> => {
-    await dispatch(fetchTours()).unwrap()
-    setShowModal(false)
+  const handleUpdateRequestStatus = useCallback(
+    async (id: string, status: "pending" | "approved" | "rejected") => {
+      try {
+        dispatch(updateRequestStatus({ id, status }));
+
+        const statusMessages = {
+          pending: t("operatorDashboard.requestStatusPending"),
+          approved: t("operatorDashboard.requestStatusApproved"),
+          rejected: t("operatorDashboard.requestStatusRejected"),
+        }
+
+        toastSuccess(statusMessages[status] || t("operatorDashboard.requestStatusUpdated"))
+      } catch (err) {
+        console.error(err)
+        toastError(t("operatorDashboard.requestStatusUpdateError"))
+      }
+    },
+    [dispatch, t],
+  )
+
+  const handleRequestsTabClick = useCallback(async () => {
+    setActiveTab("requests")
+    // Lazy load requests only when needed
+    await loadRequests()
+  }, [loadRequests])
+
+  const handleTourCreated = useCallback(() => {
+    setActiveTab("tours")
     toastInfo(t("operatorDashboard.tourListRefreshed"))
-  }
-
-  const operatorRequests = requests.filter((req) => {
-    const populatedReq = req as PopulatedRequest
-    return populatedReq.tour?.operator?._id === user?._id
-  })
+  }, [t])
 
   if (!user) {
     return <div>{t("common.loading")}</div>
@@ -104,10 +100,7 @@ const OperatorDashboard: React.FC = () => {
             {t("operatorDashboard.createTour")}
           </button>
           <button
-            onClick={() => {
-              setActiveTab("requests")
-              handleFetchRequests()
-            }}
+            onClick={handleRequestsTabClick}
             className={`py-2 px-1 border-b-2 font-medium text-sm ${
               activeTab === "requests"
                 ? "border-blue-500 text-blue-600"
@@ -125,109 +118,149 @@ const OperatorDashboard: React.FC = () => {
       {activeTab === "create" && (
         <div className="max-w-2xl">
           <h3 className="text-lg font-semibold mb-4">{t("operatorDashboard.createNewTour")}</h3>
-          <CreateTourForm onClose={() => setActiveTab("tours")} />
+          <CreateTourForm onClose={handleTourCreated} />
         </div>
       )}
 
       {activeTab === "requests" && (
-        <div>
-          <h3 className="text-lg font-semibold mb-4">{t("operatorDashboard.requestsOnTours")}</h3>
-          {operatorRequests.length === 0 ? (
-            <div className="text-center py-8">
-              <p className="text-gray-600">{t("operatorDashboard.noRequests")}</p>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {operatorRequests.map((req) => {
-                const populatedReq = req as PopulatedRequest
-                return (
-                  <div key={req._id} className="card">
-                    <div className="flex justify-between items-start">
-                      <div className="flex-1">
-                        <h4 className="font-semibold text-lg mb-2">{populatedReq.tour.title}</h4>
-                        <div className="grid grid-cols-2 gap-4 text-sm">
-                          <div>
-                            <span className="font-medium">{t("operatorDashboard.client")}:</span>
-                            <span className="ml-2">{req.customerName}</span>
-                          </div>
-                          <div>
-                            <span className="font-medium">{t("operatorDashboard.email")}:</span>
-                            <span className="ml-2">{req.customerEmail}</span>
-                          </div>
-                          <div>
-                            <span className="font-medium">{t("requests.status")}:</span>
-                            <span
-                              className={`ml-2 px-2 py-1 rounded text-xs ${
-                                req.status === "pending"
-                                  ? "bg-yellow-100 text-yellow-800"
-                                  : req.status === "approved"
-                                    ? "bg-green-100 text-green-800"
-                                    : "bg-red-100 text-red-800"
-                              }`}
-                            >
-                              {t(`requests.status.${req.status}`)}
-                            </span>
-                          </div>
-                          <div>
-                            <span className="font-medium">{t("tours.price")}:</span>
-                            <span className="ml-2 font-bold text-blue-600">{populatedReq.tour.price} грн</span>
-                          </div>
-                        </div>
+        <OperatorRequestsList
+          requests={operatorRequests as PopulatedRequest[]}
+          actionLoading={loading}
+          onDeleteRequest={handleDeleteRequest}
+          onUpdateStatus={handleUpdateRequestStatus}
+        />
+      )}
+    </div>
+  )
+})
 
-                        {/* Status update buttons */}
-                        <div className="mt-4 flex gap-2">
-                          <button
-                            onClick={() => handleUpdateRequestStatus(req._id, "approved")}
-                            disabled={req.status === "approved" || loading}
-                            className={`px-3 py-1 text-sm rounded ${
-                              req.status === "approved"
-                                ? "bg-gray-200 text-gray-500 cursor-not-allowed"
-                                : "bg-green-500 text-white hover:bg-green-600"
-                            }`}
-                          >
-                            {t("requests.approve")}
-                          </button>
-                          <button
-                            onClick={() => handleUpdateRequestStatus(req._id, "rejected")}
-                            disabled={req.status === "rejected" || loading}
-                            className={`px-3 py-1 text-sm rounded ${
-                              req.status === "rejected"
-                                ? "bg-gray-200 text-gray-500 cursor-not-allowed"
-                                : "bg-red-500 text-white hover:bg-red-600"
-                            }`}
-                          >
-                            {t("requests.reject")}
-                          </button>
-                          <button
-                            onClick={() => handleUpdateRequestStatus(req._id, "pending")}
-                            disabled={req.status === "pending" || loading}
-                            className={`px-3 py-1 text-sm rounded ${
-                              req.status === "pending"
-                                ? "bg-gray-200 text-gray-500 cursor-not-allowed"
-                                : "bg-yellow-500 text-white hover:bg-yellow-600"
-                            }`}
-                          >
-                            {t("requests.markPending")}
-                          </button>
-                        </div>
-                      </div>
-                      <button
-                        onClick={() => handleDeleteRequest(req._id)}
-                        disabled={loading}
-                        className="btn bg-red-500 text-white hover:bg-red-600 ml-4 disabled:opacity-50"
-                      >
-                        {loading ? t("common.loading") : t("operatorDashboard.delete")}
-                      </button>
-                    </div>
-                  </div>
-                )
-              })}
-            </div>
-          )}
+// Memoized requests list component
+const OperatorRequestsList = React.memo<{
+  requests: PopulatedRequest[]
+  actionLoading: boolean
+  onDeleteRequest: (id: string) => void
+  onUpdateStatus: (id: string, status: "pending" | "approved" | "rejected") => void
+}>(({ requests, actionLoading, onDeleteRequest, onUpdateStatus }) => {
+  const { t } = useTranslation()
+
+  return (
+    <div>
+      <h3 className="text-lg font-semibold mb-4">{t("operatorDashboard.requestsOnTours")}</h3>
+      {requests.length === 0 ? (
+        <div className="text-center py-8">
+          <p className="text-gray-600">{t("operatorDashboard.noRequests")}</p>
+        </div>
+      ) : (
+        <div className="space-y-4">
+          {requests.map((req) => (
+            <RequestCard
+              key={req._id}
+              request={req}
+              actionLoading={actionLoading}
+              onDelete={onDeleteRequest}
+              onUpdateStatus={onUpdateStatus}
+            />
+          ))}
         </div>
       )}
     </div>
   )
-}
+})
+
+// Memoized individual request card
+const RequestCard = React.memo<{
+  request: PopulatedRequest
+  actionLoading: boolean
+  onDelete: (id: string) => void
+  onUpdateStatus: (id: string, status: "pending" | "approved" | "rejected") => void
+}>(({ request, actionLoading, onDelete, onUpdateStatus }) => {
+  const { t } = useTranslation()
+
+  return (
+    <div className="card">
+      <div className="flex justify-between items-start">
+        <div className="flex-1">
+          <h4 className="font-semibold text-lg mb-2">{request.tour.title}</h4>
+          <div className="grid grid-cols-2 gap-4 text-sm">
+            <div>
+              <span className="font-medium">{t("operatorDashboard.client")}:</span>
+              <span className="ml-2">{request.customerName}</span>
+            </div>
+            <div>
+              <span className="font-medium">{t("operatorDashboard.email")}:</span>
+              <span className="ml-2">{request.customerEmail}</span>
+            </div>
+            <div>
+              <span className="font-medium">{t("requests.status")}:</span>
+              <span
+                className={`ml-2 px-2 py-1 rounded text-xs ${
+                  request.status === "pending"
+                    ? "bg-yellow-100 text-yellow-800"
+                    : request.status === "approved"
+                      ? "bg-green-100 text-green-800"
+                      : "bg-red-100 text-red-800"
+                }`}
+              >
+                {t(`requests.status.${request.status}`)}
+              </span>
+            </div>
+            <div>
+              <span className="font-medium">{t("tours.price")}:</span>
+              <span className="ml-2 font-bold text-blue-600">{request.tour.price} грн</span>
+            </div>
+          </div>
+
+          {/* Status update buttons */}
+          <div className="mt-4 flex gap-2">
+            <button
+              onClick={() => onUpdateStatus(request._id, "approved")}
+              disabled={request.status === "approved" || actionLoading}
+              className={`px-3 py-1 text-sm rounded ${
+                request.status === "approved"
+                  ? "bg-gray-200 text-gray-500 cursor-not-allowed"
+                  : "bg-green-500 text-white hover:bg-green-600"
+              }`}
+            >
+              {t("requests.approve")}
+            </button>
+            <button
+              onClick={() => onUpdateStatus(request._id, "rejected")}
+              disabled={request.status === "rejected" || actionLoading}
+              className={`px-3 py-1 text-sm rounded ${
+                request.status === "rejected"
+                  ? "bg-gray-200 text-gray-500 cursor-not-allowed"
+                  : "bg-red-500 text-white hover:bg-red-600"
+              }`}
+            >
+              {t("requests.reject")}
+            </button>
+            <button
+              onClick={() => onUpdateStatus(request._id, "pending")}
+              disabled={request.status === "pending" || actionLoading}
+              className={`px-3 py-1 text-sm rounded ${
+                request.status === "pending"
+                  ? "bg-gray-200 text-gray-500 cursor-not-allowed"
+                  : "bg-yellow-500 text-white hover:bg-yellow-600"
+              }`}
+            >
+              {t("requests.markPending")}
+            </button>
+          </div>
+        </div>
+        <button
+          onClick={() => onDelete(request._id)}
+          disabled={actionLoading}
+          className="btn bg-red-500 text-white hover:bg-red-600 ml-4 disabled:opacity-50"
+        >
+          {actionLoading ? t("common.loading") : t("operatorDashboard.delete")}
+        </button>
+      </div>
+    </div>
+  )
+})
+
+OperatorDashboard.displayName = "OperatorDashboard"
+OperatorRequestsList.displayName = "OperatorRequestsList"
+RequestCard.displayName = "RequestCard"
 
 export default OperatorDashboard

@@ -1,5 +1,5 @@
 // Custom hook for auth-related operations
-import { useAppSelector, useAppDispatch } from "@/app/store"
+import { useAppSelector, useAppDispatch } from "@/store"
 import { logoutAsync as logout } from "../features/auth/authSlice"
 
 export const useAuth = () => {

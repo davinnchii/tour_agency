@@ -1,5 +1,5 @@
 // Additional store-related types
-import type { RootState } from "@/app/store"
+import type { RootState } from "@/store"
 
 // Individual state slice types - these are the types for each slice
 export type AuthState = RootState["auth"]

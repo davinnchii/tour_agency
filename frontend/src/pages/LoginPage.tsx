@@ -4,7 +4,7 @@ import type React from "react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate, Link } from "react-router-dom";
-import { useAppDispatch } from "@/app/store";
+import { useAppDispatch } from "@/store";
 import { loginAsync } from "../features/auth/authSlice";
 import { login } from "../api/authService";
 import LanguageSwitcher from "@/components/LanguageSwitcher";

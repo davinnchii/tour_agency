@@ -7,7 +7,7 @@ import { Controller, useForm } from "react-hook-form"
 import { addTour } from "../features/tours/tourSlice"
 import Select from "react-select"
 import { useTranslation } from "react-i18next"
-import { useAppDispatch, useAppSelector } from "@/app/store"
+import { useAppDispatch, useAppSelector } from "@/store"
 import { toastSuccess, toastError } from "../utils/toast"
 import type { CreateTourPayload, User } from "../types"
 

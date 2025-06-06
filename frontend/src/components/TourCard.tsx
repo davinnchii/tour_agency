@@ -2,11 +2,12 @@
 
 import type React from "react"
 import { useTranslation } from "react-i18next"
-import { useAppDispatch, useAppSelector } from "@/app/store"
+import { useAppDispatch, useAppSelector } from "@/store"
 import { addRequest } from "@/features/requests/requestsSlice"
 import { removeTour } from "../features/tours/tourSlice"
 import { toastSuccess, toastError } from "../utils/toast"
 import type { Tour, PopulatedTour, Request } from "../types"
+import { useAppData } from "@/hooks"
 
 interface TourCardProps {
   tour: Tour | PopulatedTour
@@ -20,6 +21,7 @@ const TourCard: React.FC<TourCardProps> = ({ tour, variant = "default", showActi
   const dispatch = useAppDispatch()
   const user = useAppSelector((state) => state.auth.user)
   const { loading } = useAppSelector((state) => state.requests)
+  const { refreshData } = useAppData()
 
   const isOperator = user?.role === "operator"
   const isAgent = user?.role === "agent"
@@ -47,6 +49,7 @@ const TourCard: React.FC<TourCardProps> = ({ tour, variant = "default", showActi
 
     try {
       await dispatch(addRequest(requestData)).unwrap()
+      await refreshData.requests()
       toastSuccess(t("tours.requestCreated"))
     } catch (error) {
       console.error("Failed to create request:", error)

@@ -1,7 +1,7 @@
 "use client"
 
 import type React from "react"
-import { useAppDispatch, useAppSelector } from "@/app/store"
+import { useAppDispatch, useAppSelector } from "@/store"
 import { fetchTours, setPage } from "../features/tours/tourSlice"
 
 const TourPagination: React.FC = () => {

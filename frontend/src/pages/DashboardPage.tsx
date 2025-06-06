@@ -1,13 +1,13 @@
 "use client"
 
-import type React from "react"
-import { useAuth } from "@/hooks/useAuth"
+import React from "react"
+import { useAuth } from "../hooks/useAuth"
 import { useTranslation } from "react-i18next"
-import LanguageSwitcher from "@/components/LanguageSwitcher"
 import OperatorDashboard from "@/components/OperatorDashboard"
 import AgentDashboard from "@/components/AgentDashboard"
+import LanguageSwitcher from "@/components/LanguageSwitcher"
 
-const DashboardLayout: React.FC = () => {
+const DashboardLayout: React.FC = React.memo(() => {
   const { user, isOperator, isAgent, logout } = useAuth()
   const { t } = useTranslation()
 
@@ -48,6 +48,8 @@ const DashboardLayout: React.FC = () => {
       </main>
     </div>
   )
-}
+})
+
+DashboardLayout.displayName = "DashboardLayout"
 
 export default DashboardLayout

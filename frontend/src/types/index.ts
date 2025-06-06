@@ -118,7 +118,7 @@ export interface CreateRequestPayload {
 
 export interface CreateSubscriptionPayload {
   agency: string
-  operator: string
+  operatorId: string
   endDate?: string
 }
 

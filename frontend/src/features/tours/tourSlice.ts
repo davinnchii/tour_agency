@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk, type PayloadAction } from "@reduxjs/toolkit"
 import { createTour, deleteTour, getTours, searchTours } from "../../api/tourService"
-import type { Tour, CreateTourPayload, TourSearchParams, PaginatedToursResponse } from "@/types/index"
+import type { Tour, CreateTourPayload, TourSearchParams, PaginatedToursResponse } from "../../types"
 
 interface TourState {
   tours: Tour[]
@@ -38,27 +38,51 @@ const initialState: TourState = {
   searchLoading: false,
 }
 
-export const fetchTours = createAsyncThunk<PaginatedToursResponse, TourSearchParams | void>(
+export const fetchTours = createAsyncThunk<PaginatedToursResponse, TourSearchParams | undefined>(
   "tours/fetchTours",
   async (params) => {
-    const response = await getTours(params)
-    return response.data as PaginatedToursResponse
+    try {
+      const response = await getTours(params)
+      // Ensure we always return PaginatedToursResponse structure
+      if (response.data?.data) {
+        return response.data.data as PaginatedToursResponse
+      }
+      return response.data as PaginatedToursResponse
+    } catch (error) {
+      throw error
+    }
   },
 )
 
 export const searchToursAsync = createAsyncThunk<PaginatedToursResponse, TourSearchParams>(
   "tours/searchTours",
   async (searchParams: TourSearchParams) => {
-    const response = await searchTours(searchParams)
-    return response.data as PaginatedToursResponse
+    try {
+      const response = await searchTours(searchParams)
+      // Ensure we always return PaginatedToursResponse structure
+      if (response.data?.data) {
+        return response.data.data as PaginatedToursResponse
+      }
+      return response.data as PaginatedToursResponse
+    } catch (error) {
+      throw error
+    }
   },
 )
 
 export const addTour = createAsyncThunk<Tour, CreateTourPayload>(
   "tours/addTour",
   async (tourData: CreateTourPayload) => {
-    const response = await createTour(tourData)
-    return response.data as Tour
+    try {
+      const response = await createTour(tourData)
+      // Ensure we always return Tour structure
+      if (response.data?.data) {
+        return response.data.data as Tour
+      }
+      return response.data as Tour
+    } catch (error) {
+      throw error
+    }
   },
 )
 
@@ -140,6 +164,7 @@ const tourSlice = createSlice({
       // Remove tour
       .addCase(removeTour.fulfilled, (state, action) => {
         state.tours = state.tours.filter((tour) => tour._id !== action.payload)
+        state.searchResults = state.searchResults.filter((tour) => tour._id !== action.payload)
         state.pagination.total = Math.max(0, state.pagination.total - 1)
       })
   },

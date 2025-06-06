@@ -16,6 +16,10 @@ const initialState: UserState = {
 
 export const getOperators = createAsyncThunk<User[], void>("users/getOperators", async () => {
   const response = await fetchOperators()
+  // Handle both nested and direct response formats
+  if (response.data?.data) {
+    return response.data.data as User[]
+  }
   return response.data as User[]
 })
 

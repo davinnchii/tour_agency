@@ -18,6 +18,10 @@ const initialState: RequestsState = {
 
 export const fetchRequests = createAsyncThunk<Request[], void>("requests/fetchRequests", async () => {
   const response = await getRequests()
+  // Handle both nested and direct response formats
+  if (response.data?.data) {
+    return response.data.data as Request[]
+  }
   return response.data as Request[]
 })
 
@@ -25,6 +29,10 @@ export const addRequest = createAsyncThunk<Request, CreateRequestPayload>(
   "requests/addRequest",
   async (requestData: CreateRequestPayload) => {
     const response = await createRequest(requestData)
+    // Handle both nested and direct response formats
+    if (response.data?.data) {
+      return response.data.data as Request
+    }
     return response.data as Request
   },
 )

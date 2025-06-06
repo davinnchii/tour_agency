@@ -18,6 +18,10 @@ export const fetchSubscriptions = createAsyncThunk<Subscription[], void>(
   "subscriptions/fetchSubscriptions",
   async () => {
     const response = await getSubscriptions()
+    // Handle both nested and direct response formats
+    if (response.data?.data) {
+      return response.data.data as Subscription[]
+    }
     return response.data as Subscription[]
   },
 )
@@ -26,6 +30,10 @@ export const addSubscription = createAsyncThunk<Subscription, CreateSubscription
   "subscriptions/addSubscription",
   async (subscriptionData: CreateSubscriptionPayload) => {
     const response = await createSubscription(subscriptionData)
+    // Handle both nested and direct response formats
+    if (response.data?.data) {
+      return response.data.data as Subscription
+    }
     return response.data as Subscription
   },
 )

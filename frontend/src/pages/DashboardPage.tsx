@@ -1,59 +1,53 @@
-import React from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
-import AgentDashboard from '../components/AgentDashboard';
-import OperatorDashboard from '../components/OperatorDashboard';
-import { logout } from '../features/auth/authSlice';
-import { useTranslation } from 'react-i18next';
-import { AuthState } from '@/types/store';
+"use client"
 
-const DashboardPage = () => {
-    const { t } = useTranslation();
-    const navigate = useNavigate();
-    const dispatch = useDispatch();
-    const user = useSelector((state: AuthState) => state.auth.user);
+import type React from "react"
+import { useAuth } from "@/hooks/useAuth"
+import { useTranslation } from "react-i18next"
+import LanguageSwitcher from "@/components/LanguageSwitcher"
+import OperatorDashboard from "@/components/OperatorDashboard"
+import AgentDashboard from "@/components/AgentDashboard"
 
-    if (!user) {
-        navigate('/login');
-        return null;
-    }
+const DashboardLayout: React.FC = () => {
+  const { user, isOperator, isAgent, logout } = useAuth()
+  const { t } = useTranslation()
 
-    const handleLogout = () => {
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
-        dispatch(logout());
-        navigate('/login');
-    };
+  if (!user) {
+    return <div>{t("common.loading")}</div>
+  }
 
-    return (
-        <div className="min-h-screen bg-gray-100 p-6">
-            <div className="max-w-4xl mx-auto bg-white rounded-xl shadow p-6">
-                <div className="flex justify-between items-center mb-6">
-                    <h1 className="text-2xl font-bold">
-                        {t('dashboard.welcome')}, {user.name}!
-                    </h1>
-                    <button
-                        onClick={handleLogout}
-                        className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition"
-                    >
-                        {t('dashboard.logout')}
-                    </button>
-                </div>
-
-                <p className="text-gray-600 mb-6">
-                    {t('dashboard.role')}: <span className="font-semibold">{user.role}</span>
-                </p>
-
-                {user.role === 'agent' ? (
-                    <AgentDashboard />
-                ) : user.role === 'operator' ? (
-                    <OperatorDashboard />
-                ) : (
-                    <p className="text-red-600">{t('dashboard.unknownRole')}</p>
-                )}
+  return (
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <header className="bg-white shadow-sm border-b">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16">
+            <div>
+              <h1 className="text-xl font-semibold">{t("auth.welcome", { name: user.name })}</h1>
+              <p className="text-sm text-gray-600">
+                {t("dashboard.role")}: <span className="font-medium">{user.role}</span>
+              </p>
             </div>
-        </div>
-    );
-};
 
-export default DashboardPage;
+            <div className="flex items-center space-x-4">
+              <LanguageSwitcher />
+              <button
+                onClick={logout}
+                className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition-colors"
+              >
+                {t("auth.logout")}
+              </button>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      {/* Main Content */}
+      <main className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+        {isOperator && <OperatorDashboard />}
+        {isAgent && <AgentDashboard />}
+      </main>
+    </div>
+  )
+}
+
+export default DashboardLayout

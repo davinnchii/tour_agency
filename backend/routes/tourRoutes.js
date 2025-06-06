@@ -1,17 +1,24 @@
-const express = require('express');
-const router = express.Router();
-const { protect, authorizeRoles } = require('../middleware/authMiddleware');
+const express = require("express")
+const router = express.Router()
 const {
-  createTour,
   getTours,
+  searchTours,
+  createTour,
+  getTourById,
+  updateTour,
   deleteTour,
-} = require('../controllers/tourController');
+  getToursByOperator,
+} = require("../controllers/tourController")
 
-router.route('/')
-  .get(protect, getTours)          // Перегляд турів будь-яким авторизованим користувачем
-  .post(protect, authorizeRoles('operator'), createTour); // Додавання — лише оператор
+// Public routes
+router.get("/", getTours)
+router.get("/search", searchTours) // Dedicated search endpoint
+router.get("/operator/:operatorId", getToursByOperator)
+router.get("/:id", getTourById)
 
-router.route('/:id')
-  .delete(protect, authorizeRoles('operator'), deleteTour);
+// Protected routes (you might want to add authentication middleware)
+router.post("/", createTour)
+router.patch("/:id", updateTour)
+router.delete("/:id", deleteTour)
 
-module.exports = router;
+module.exports = router

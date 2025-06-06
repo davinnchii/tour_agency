@@ -27,7 +27,7 @@ export interface Tour extends BaseDocument {
   price: number
   startDate?: string // ISO date string from database
   endDate?: string // ISO date string from database
-  operator: User // ObjectId reference
+  operator: string // ObjectId reference
 }
 
 // Populated tour (when operator is populated)
@@ -42,8 +42,8 @@ export interface Request extends BaseDocument {
   customerEmail: string
   status: "pending" | "approved" | "rejected"
   createdBy: string // ObjectId reference
-  agency?: User // ObjectId reference (optional)
-  operator?: User // ObjectId reference (optional)
+  agency?: string // ObjectId reference (optional)
+  operator?: string // ObjectId reference (optional)
 }
 
 // Populated request (when references are populated)
@@ -60,6 +60,12 @@ export interface Subscription extends BaseDocument {
   operator: User // ObjectId reference
   startDate: string // ISO date string
   endDate?: string // ISO date string (optional)
+}
+
+// Populated subscription (when references are populated)
+export interface PopulatedSubscription extends Omit<Subscription, "agency" | "operator"> {
+  agency: User
+  operator: User
 }
 
 // Pagination types
@@ -80,12 +86,14 @@ export interface PaginatedToursResponse {
   tours: Tour[]
 }
 
-// API Response wrapper
+// API Response wrapper - Updated to match your backend
 export interface ApiResponse<T> {
   data?: T
   message?: string
   success?: boolean
   error?: string
+  token?: string // For auth responses
+  user?: User // For auth responses
 }
 
 // API payload types (what gets sent to the server - uses strings)
@@ -96,7 +104,7 @@ export interface CreateTourPayload {
   price: number
   startDate?: string // ISO string for API
   endDate?: string // ISO string for API
-  operator: User
+  operator: string
 }
 
 export interface CreateRequestPayload {
@@ -110,7 +118,7 @@ export interface CreateRequestPayload {
 
 export interface CreateSubscriptionPayload {
   agency: string
-  operatorId: string
+  operator: string
   endDate?: string
 }
 
@@ -124,10 +132,16 @@ export interface UpdateRequestPayload extends Partial<CreateRequestPayload> {
   status?: "pending" | "approved" | "rejected"
 }
 
-// Auth types
+// Auth types - Updated to match your backend response
 export interface LoginPayload {
   token: string
-  user: User
+  user: {
+    _id: string // Note: backend uses 'id' not '_id'
+    name: string
+    email: string
+    role: "agent" | "operator"
+    subscriptions: string[]
+  }
 }
 
 export interface LoginCredentials {

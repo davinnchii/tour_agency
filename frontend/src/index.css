@@ -1,1 +1,117 @@
 @import "tailwindcss";
+
+@theme {
+    --color-border: #e5e7eb; /* gray-200 equivalent */
+    --color-border-light: #f3f4f6; /* gray-100 equivalent */
+    --color-border-dark: #d1d5db; /* gray-300 equivalent */
+
+    /* You can also define semantic border colors */
+    --color-border-input: #d1d5db;
+    --color-border-focus: #3b82f6; /* blue-500 */
+    --color-border-error: #ef4444; /* red-500 */
+    --color-border-success: #10b981; /* emerald-500 */
+}
+/* Set default border color globally */
+@layer base {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+    border-color: theme(
+      --color-border
+    ); /* This sets the default border color */
+    
+  }
+
+  /* Reset margins */
+  * {
+    margin: 0;
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto",
+      "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans",
+      "Helvetica Neue", sans-serif;
+    background-color: theme(--color-gray-50);
+    color: theme(--color-gray-900);
+  }
+
+  /* Default border styles for common elements */
+  input,
+  textarea,
+  select {
+    border-color: var(--color-border-input);
+  }
+
+  input:focus,
+  textarea:focus,
+  select:focus {
+    border-color: var(--color-border-focus);
+    outline: none;
+    box-shadow: 0 0 0 3px var(--color-border-focus / 10%);
+  }
+
+  /* Error states */
+  input[aria-invalid="true"],
+  textarea[aria-invalid="true"],
+  select[aria-invalid="true"] {
+    border-color: var(--color-border-error);
+  }
+}
+
+/* Custom component styles with default borders */
+@layer components {
+  .btn {
+    @apply px-4 py-2 rounded font-medium transition-colors border;
+    /* border will use the default border color */
+  }
+
+  .btn-primary {
+    @apply bg-blue-500 text-white hover:bg-blue-600 border-blue-500;
+  }
+
+  .btn-secondary {
+    @apply bg-white text-gray-900 hover:bg-gray-50;
+    /* Uses default border color */
+  }
+
+  .input {
+    @apply w-full px-3 py-2 border rounded-md transition-colors;
+    /* border uses default border-input color */
+  }
+
+  .card {
+    @apply bg-white rounded-lg shadow-sm border p-6;
+    /* border uses default border color */
+  }
+
+  .divider {
+    @apply border-t;
+    /* Uses default border color */
+  }
+
+  /* Form field wrapper */
+  .field {
+    @apply space-y-1;
+  }
+
+  .field label {
+    @apply block text-sm font-medium text-gray-700;
+  }
+
+  .field input,
+  .field textarea,
+  .field select {
+    @apply w-full px-3 py-2 border rounded-md transition-colors;
+  }
+
+  .field .error {
+    @apply text-sm text-red-600;
+  }
+}

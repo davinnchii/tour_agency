@@ -2,24 +2,26 @@
 
 import type React from "react"
 import { useEffect, useState } from "react"
-import { fetchTours } from "@/features/tours/tourSlice"
-import { fetchSubscriptions, addSubscription, removeSubscription } from "@/features/subscriptions/subscriptionSlice"
-import { addRequest, fetchRequests, removeRequest } from "@/features/requests/requestsSlice"
-import { getOperators } from "../features/users/userSlice"
 import { useTranslation } from "react-i18next"
 import { useAppDispatch, useAppSelector } from "@/app/store"
-import type { User, Tour, CreateSubscriptionPayload, Subscription, Request } from "../types"
+import { fetchTours } from "../features/tours/tourSlice"
+import { fetchSubscriptions, addSubscription, removeSubscription } from "../features/subscriptions/subscriptionSlice"
+import { fetchRequests, removeRequest } from "@/features/requests/requestsSlice"
+import { getOperators } from "../features/users/userSlice"
+
+import type { User, Subscription, PopulatedRequest, Request } from "@/types"
+import TourSearchResults from "./TourSearchResult"
 
 const AgentDashboard: React.FC = () => {
   const { t } = useTranslation()
   const dispatch = useAppDispatch()
-  const tours = useAppSelector((state) => state.tours.tours)
+
   const user = useAppSelector((state) => state.auth.user)
   const { operators, loading } = useAppSelector((state) => state.users)
   const subscriptions = useAppSelector((state) => state.subscriptions.subscriptions) as Subscription[]
   const { requests, loaded } = useAppSelector((state) => state.requests)
 
-  const [showSubs, setShowSubs] = useState<boolean>(false)
+  const [activeTab, setActiveTab] = useState<"tours" | "operators" | "requests">("tours")
 
   useEffect(() => {
     dispatch(getOperators()).unwrap()
@@ -30,7 +32,7 @@ const AgentDashboard: React.FC = () => {
   const handleSubscribe = async (operator: User): Promise<void> => {
     if (!user) return
 
-    const data: CreateSubscriptionPayload = {
+    const data = {
       agency: user._id,
       operatorId: operator._id,
     }
@@ -45,40 +47,13 @@ const AgentDashboard: React.FC = () => {
     }
   }
 
-  const handleFetchRequests = async (): Promise<void> => {
-    if (showSubs) {
-      setShowSubs(false)
-      return
-    }
-
-    if (!loaded) {
-      try {
-        await dispatch(fetchRequests()).unwrap()
-      } catch (err) {
-        console.error(err)
-      }
-    }
-
-    setShowSubs(true)
-  }
-
-  const handleCreateRequest = async (tour: Tour): Promise<void> => {
-    if (!user) return
-
-    const data = {
-      tour: tour._id,
-      customerName: user.name,
-      customerEmail: user.email,
-      createdBy: user._id,
-    }
-
+  const handleDeleteSubscription = async (id: string): Promise<void> => {
     try {
-      await dispatch(addRequest(data)).unwrap()
-      await dispatch(fetchRequests()).unwrap()
-      alert(t("agentDashboard.requestAdded"))
+      await dispatch(removeSubscription(id)).unwrap()
+      await dispatch(fetchSubscriptions()).unwrap()
+      alert(t("agentDashboard.subscriptionDeleted"))
     } catch (err) {
-      console.error(err)
-      alert(t("agentDashboard.requestAddError"))
+      console.error(t("agentDashboard.subscriptionDeleteError"), err)
     }
   }
 
@@ -93,13 +68,13 @@ const AgentDashboard: React.FC = () => {
     }
   }
 
-  const handleDeleteSubscription = async (id: string): Promise<void> => {
-    try {
-      await dispatch(removeSubscription(id)).unwrap()
-      await dispatch(fetchSubscriptions()).unwrap()
-      alert(t("agentDashboard.subscriptionDeleted"))
-    } catch (err) {
-      console.error(t("agentDashboard.subscriptionDeleteError"), err)
+  const handleFetchRequests = async (): Promise<void> => {
+    if (!loaded) {
+      try {
+        await dispatch(fetchRequests()).unwrap()
+      } catch (err) {
+        console.error(err)
+      }
     }
   }
 
@@ -108,107 +83,119 @@ const AgentDashboard: React.FC = () => {
   }
 
   return (
-    <div>
-      <h3 className="text-lg font-semibold mb-2">{t("agentDashboard.operatorList")}</h3>
-      {loading ? (
-        <p>{t("agentDashboard.loading")}</p>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-          {operators.map((op: User) => {
-            const isSubscribed = subscriptions.some((sub) => sub.operator && sub.operator._id === op._id)
-
-            return (
-              <div key={op._id} className="border rounded-xl p-4 shadow-md flex justify-between items-center bg-white">
-                <div>
-                  <h4 className="font-bold text-lg">{op.name}</h4>
-                  <p className="text-sm text-gray-600">{op.email}</p>
-                </div>
-                <div>
-                  {isSubscribed ? (
-                    <button
-                      onClick={() => {
-                        const sub = subscriptions.find((s) => s.operator && s.operator._id === op._id)
-                        if (sub) handleDeleteSubscription(sub._id)
-                      }}
-                      className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 text-sm"
-                    >
-                      {t("agentDashboard.unsubscribe")}
-                    </button>
-                  ) : (
-                    <button
-                      onClick={() => handleSubscribe(op)}
-                      className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600 text-sm"
-                    >
-                      {t("agentDashboard.subscribe")}
-                    </button>
-                  )}
-                </div>
-              </div>
-            )
-          })}
-        </div>
-      )}
-      <div className="space-y-3 mb-6">
-        <button
-          className="w-full bg-purple-500 text-white py-2 rounded hover:bg-purple-600 transition"
-          onClick={handleFetchRequests}
-        >
-          {showSubs ? t("agentDashboard.hideRequests") : t("agentDashboard.showRequests")}
-        </button>
+    <div className="space-y-6">
+      {/* Navigation Tabs */}
+      <div className="border-b">
+        <nav className="flex space-x-8">
+          <button
+            onClick={() => setActiveTab("tours")}
+            className={`py-2 px-1 border-b-2 font-medium text-sm ${
+              activeTab === "tours"
+                ? "border-blue-500 text-blue-600"
+                : "border-transparent text-gray-500 hover:text-gray-700"
+            }`}
+          >
+            {t("agentDashboard.searchTours")}
+          </button>
+          <button
+            onClick={() => setActiveTab("operators")}
+            className={`py-2 px-1 border-b-2 font-medium text-sm ${
+              activeTab === "operators"
+                ? "border-blue-500 text-blue-600"
+                : "border-transparent text-gray-500 hover:text-gray-700"
+            }`}
+          >
+            {t("agentDashboard.operators")}
+          </button>
+          <button
+            onClick={() => {
+              setActiveTab("requests")
+              handleFetchRequests()
+            }}
+            className={`py-2 px-1 border-b-2 font-medium text-sm ${
+              activeTab === "requests"
+                ? "border-blue-500 text-blue-600"
+                : "border-transparent text-gray-500 hover:text-gray-700"
+            }`}
+          >
+            {t("agentDashboard.myRequests")}
+          </button>
+        </nav>
       </div>
 
-      {/* Tour Overview */}
-      {tours.length > 0 && (
-        <div className="mb-6">
-          <h3 className="text-lg font-bold mb-2">{t("agentDashboard.availableTours")}</h3>
-          <ul className="space-y-2">
-            {tours.map((tour) => (
-              <li key={tour._id} className="border p-3 rounded flex justify-between items-center">
-                <div>
-                  <p className="font-semibold">{tour.title}</p>
-                  <p className="text-sm text-gray-600">
-                    {tour.country}, {tour.price} грн
-                  </p>
-                </div>
-                <button
-                  onClick={() => handleCreateRequest(tour)}
-                  className="text-sm bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
-                >
-                  {t("agentDashboard.submitRequest")}
-                </button>
-              </li>
-            ))}
-          </ul>
+      {/* Tab Content */}
+      {activeTab === "tours" && <TourSearchResults />}
+
+      {activeTab === "operators" && (
+        <div>
+          <h3 className="text-lg font-semibold mb-4">{t("agentDashboard.operatorList")}</h3>
+          {loading ? (
+            <p>{t("agentDashboard.loading")}</p>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {operators.map((op) => {
+                const isSubscribed = subscriptions.some((sub) => sub.operator && sub.operator._id === op._id)
+
+                return (
+                  <div key={op._id} className="card flex justify-between items-center">
+                    <div>
+                      <h4 className="font-bold text-lg">{op.name}</h4>
+                      <p className="text-sm text-gray-600">{op.email}</p>
+                    </div>
+                    <div>
+                      {isSubscribed ? (
+                        <button
+                          onClick={() => {
+                            const sub = subscriptions.find((s) => s.operator && s.operator._id === op._id)
+                            if (sub) handleDeleteSubscription(sub._id)
+                          }}
+                          className="btn bg-red-500 text-white hover:bg-red-600"
+                        >
+                          {t("agentDashboard.unsubscribe")}
+                        </button>
+                      ) : (
+                        <button onClick={() => handleSubscribe(op)} className="btn btn-primary">
+                          {t("agentDashboard.subscribe")}
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          )}
         </div>
       )}
 
-      {/* Requests Dropdown */}
-      {showSubs && (
+      {activeTab === "requests" && (
         <div>
-          <h3 className="text-lg font-bold mb-2">{t("agentDashboard.yourRequests")}</h3>
+          <h3 className="text-lg font-semibold mb-4">{t("agentDashboard.yourRequests")}</h3>
           {requests.length === 0 ? (
-            <p>{t("agentDashboard.noRequests")}</p>
+            <div className="text-center py-8">
+              <p className="text-gray-600">{t("agentDashboard.noRequests")}</p>
+            </div>
           ) : (
-            <ul className="space-y-2">
+            <div className="space-y-4">
               {(requests as Request[]).map((req) => (
-                <li key={req._id} className="border p-3 rounded flex justify-between items-center">
+                <div key={req._id} className="card flex justify-between items-center">
                   <div>
-                    <p>
-                      <strong>{t("agentDashboard.destination")}:</strong> {req.tour.country}
+                    <p className="font-semibold">{req.tour.title}</p>
+                    <p className="text-sm text-gray-600">
+                      {req.tour.country} • {req.tour.price} грн
                     </p>
-                    <p>
-                      <strong>{t("agentDashboard.price")}:</strong> {req.tour.price} грн
+                    <p className="text-xs text-gray-500">
+                      {t("requests.status")}: {t(`requests.status.${req.status}`)}
                     </p>
                   </div>
                   <button
                     onClick={() => handleDeleteRequest(req._id)}
-                    className="text-sm bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
+                    className="btn bg-red-500 text-white hover:bg-red-600"
                   >
                     {t("agentDashboard.delete")}
                   </button>
-                </li>
+                </div>
               ))}
-            </ul>
+            </div>
           )}
         </div>
       )}

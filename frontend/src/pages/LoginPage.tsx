@@ -1,85 +1,118 @@
-import React, { FormEvent, FormEventHandler, useState } from 'react';
-import { useDispatch } from 'react-redux';
-import { loginSuccess } from '../features/auth/authSlice';
-import { Link, useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import { API_URL } from '../utils/const';
-import { useTranslation } from 'react-i18next';
+"use client";
 
-const LoginPage = () => {
-    const { t } = useTranslation();
-    const dispatch = useDispatch();
-    const navigate = useNavigate();
+import type React from "react";
+import { useState } from "react";
+import { useTranslation } from "react-i18next";
+import { useNavigate, Link } from "react-router-dom";
+import { useAppDispatch } from "@/app/store";
+import { loginAsync } from "../features/auth/authSlice";
+import { login } from "../api/authService";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
 
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [error, setError] = useState('');
+const LoginPage: React.FC = () => {
+  const { t } = useTranslation();
+  const navigate = useNavigate();
+  const dispatch = useAppDispatch();
 
-    const handleLogin = async (e: FormEvent) => {
-        e.preventDefault();
-        setError('');
-        try {
-            const res = await axios.post(`${API_URL}/api/auth/login`, { email, password });
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+  });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
-            const { token, user } = res.data;
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setError("");
 
-            localStorage.setItem('token', token);
-            localStorage.setItem('user', JSON.stringify(user));
+    try {
+      const credentials = formData;
+      await dispatch(loginAsync(credentials)).unwrap();
+      navigate("/dashboard");
+    } catch (err: any) {
+      setError(err.response?.data?.message || "Login failed");
+    } finally {
+      setLoading(false);
+    }
+  };
 
-            dispatch(loginSuccess({ token, user }));
+  const handleInputChange = (field: keyof typeof formData, value: string) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
+  };
 
-            navigate('/dashboard');
-        } catch (err) {
-            console.error(err);
-            setError(t('login.errorInvalid'));
-        }
-    };
-
-    return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
-            <div className="bg-white p-8 rounded-xl shadow-lg w-full max-w-md">
-                <h2 className="text-2xl font-bold mb-6 text-center">{t('login.title')}</h2>
-                <form onSubmit={handleLogin}>
-                    <div className="mb-4">
-                        <label className="block text-sm font-medium mb-1">{t('login.email')}</label>
-                        <input
-                            type="email"
-                            className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            required
-                        />
-                    </div>
-
-                    <div className="mb-4">
-                        <label className="block text-sm font-medium mb-1">{t('login.password')}</label>
-                        <input
-                            type="password"
-                            className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            required
-                        />
-                    </div>
-
-                    {error && <div className="text-red-600 mb-4 text-sm">{error}</div>}
-
-                    <button
-                        type="submit"
-                        className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition duration-200"
-                    >
-                        {t('login.button')}
-                    </button>
-                    <p className="text-sm mt-4 text-center">
-                        {t('login.noAccount')}{' '}
-                        <Link to="/register" className="text-blue-600 hover:underline">
-                            {t('login.register')}
-                        </Link>
-                    </p>
-                </form>
-            </div>
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-md w-full space-y-8">
+        <div className="text-center">
+          <div className="flex justify-center mb-4">
+            <LanguageSwitcher />
+          </div>
+          <h2 className="text-3xl font-bold text-gray-900">
+            {t("auth.login")}
+          </h2>
+          <p className="mt-2 text-sm text-gray-600">
+            {t("auth.loginSubtitle")}
+          </p>
         </div>
-    );
+
+        <div className="card">
+          {error && (
+            <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded text-sm">
+              {error}
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="field">
+              <label htmlFor="email">{t("auth.email")}</label>
+              <input
+                id="email"
+                type="email"
+                value={formData.email}
+                onChange={(e) => handleInputChange("email", e.target.value)}
+                placeholder="agent@example.com"
+                required
+                disabled={loading}
+              />
+            </div>
+
+            <div className="field">
+              <label htmlFor="password">{t("auth.password")}</label>
+              <input
+                id="password"
+                type="password"
+                value={formData.password}
+                onChange={(e) => handleInputChange("password", e.target.value)}
+                required
+                disabled={loading}
+              />
+            </div>
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="btn btn-primary w-full"
+            >
+              {loading ? t("common.loading") : t("auth.login")}
+            </button>
+          </form>
+
+          <div className="mt-6 text-center">
+            <p className="text-sm text-gray-600">
+              {t("auth.noAccount")}{" "}
+              <Link
+                to="/register"
+                className="text-blue-600 hover:text-blue-500 font-medium"
+              >
+                {t("auth.register")}
+              </Link>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 };
 
 export default LoginPage;

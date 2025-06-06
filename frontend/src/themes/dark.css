@@ -1,0 +1,32 @@
+/* Dark theme overrides */
+@media (prefers-color-scheme: dark) {
+    @theme {
+      --color-border: #374151; /* gray-700 equivalent */
+      --color-border-light: #4b5563; /* gray-600 equivalent */
+      --color-border-dark: #1f2937; /* gray-800 equivalent */
+      --color-border-input: #4b5563;
+      --color-border-focus: #60a5fa; /* blue-400 */
+    }
+  
+    @layer base {
+      body {
+        background-color: theme(--color-gray-900);
+        color: theme(--color-gray-100);
+      }
+    }
+  }
+  
+  /* Manual dark mode class */
+  .dark {
+    @theme {
+      --color-border: #374151;
+      --color-border-light: #4b5563;
+      --color-border-dark: #1f2937;
+      --color-border-input: #4b5563;
+      --color-border-focus: #60a5fa;
+    }
+  
+    background-color: theme(--color-gray-900);
+    color: theme(--color-gray-100);
+  }
+  

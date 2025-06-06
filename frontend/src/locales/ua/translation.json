@@ -1,0 +1,193 @@
+{
+  "common": {
+    "loading": "Завантаження...",
+    "searching": "Пошук...",
+    "save": "Зберегти",
+    "cancel": "Скасувати",
+    "delete": "Видалити",
+    "edit": "Редагувати",
+    "close": "Закрити",
+    "confirm": "Підтвердити",
+    "yes": "Так",
+    "no": "Ні"
+  },
+  "auth": {
+    "login": "Увійти",
+    "logout": "Вийти",
+    "register": "Зареєструватися",
+    "email": "Електронна пошта",
+    "password": "Пароль",
+    "confirmPassword": "Підтвердити пароль",
+    "name": "Ім'я",
+    "role": "Роль",
+    "welcome": "Вітаємо, {{name}}!",
+    "loginSubtitle": "Увійдіть до свого акаунта",
+    "registerSubtitle": "Створіть новий акаунт",
+    "noAccount": "Ще не маєте акаунта?",
+    "hasAccount": "Вже маєте акаунт?",
+    "passwordMismatch": "Паролі не співпадають",
+    "passwordTooShort": "Пароль повинен містити щонайменше 6 символів",
+    "namePlaceholder": "Введіть ваше повне ім'я",
+    "passwordPlaceholder": "Мінімум 6 символів",
+    "confirmPasswordPlaceholder": "Підтвердіть ваш пароль",
+    "roles": {
+      "agent": "Турагент",
+      "operator": "Туроператор"
+    }
+  },
+  "dashboard": {
+    "title": "Панель управління",
+    "welcome": "Вітаємо, {{name}}",
+    "role": "Роль",
+    "operatorDashboard": "Панель оператора",
+    "agentDashboard": "Панель агента"
+  },
+  "agentDashboard": {
+    "searchTours": "Пошук турів",
+    "operators": "Оператори",
+    "myRequests": "Мої заявки",
+    "operatorList": "Список операторів",
+    "loading": "Завантаження операторів...",
+    "subscribe": "Підписатися",
+    "unsubscribe": "Відписатися",
+    "subscriptionCreated": "Успішно підписано на оператора",
+    "subscriptionCreateError": "Помилка створення підписки",
+    "subscriptionCreateErrorAlert": "Не вдалося створити підписку. Спробуйте ще раз.",
+    "subscriptionDeleted": "Успішно відписано",
+    "subscriptionDeleteError": "Помилка видалення підписки",
+    "yourRequests": "Ваші заявки",
+    "noRequests": "Заявок не знайдено",
+    "requestDeleted": "Заявку успішно видалено",
+    "requestDeleteError": "Помилка видалення заявки",
+    "destination": "Напрямок",
+    "price": "Ціна",
+    "delete": "Видалити",
+    "hideRequests": "Сховати заявки",
+    "showRequests": "Показати заявки",
+    "availableTours": "Доступні тури",
+    "submitRequest": "Подати заявку",
+    "requestAdded": "Заявку успішно додано",
+    "requestAddError": "Помилка додавання заявки",
+    "requestsLoadError": "Помилка завантаження заявок"
+  },
+  "operatorDashboard": {
+    "allTours": "Всі тури",
+    "createTour": "Створити тур",
+    "requests": "Заявки",
+    "createNewTour": "Створити новий тур",
+    "dashboardTitle": "Панель оператора",
+    "yourTours": "Ваші тури",
+    "deleteTour": "Видалити",
+    "tourDeleted": "Тур успішно видалено",
+    "tourDeleteError": "Помилка видалення туру",
+    "requestsOnTours": "Заявки на тури",
+    "noRequests": "Заявок не знайдено",
+    "requestDeleted": "Заявку успішно видалено",
+    "requestDeleteError": "Помилка видалення заявки",
+    "requestsLoadError": "Помилка завантаження заявок",
+    "client": "Клієнт",
+    "tour": "Тур",
+    "email": "Електронна пошта",
+    "delete": "Видалити"
+  },
+  "search": {
+    "title": "Пошук турів",
+    "search": "Пошук",
+    "showAdvanced": "Розширений пошук",
+    "hideAdvanced": "Простий пошук",
+    "activeSearch": "Знайдено {{count}} результатів",
+    "resultsTitle": "Результати пошуку",
+    "resultsCount": "Знайдено {{count}} турів",
+    "noResults": "Турів не знайдено",
+    "tryDifferentFilters": "Спробуйте змінити параметри пошуку",
+    "applyFilters": "Застосувати фільтри",
+    "clearFilters": "Очистити фільтри",
+    "resultsFound": "Сторінка {{page}} з {{totalPages}} (всього {{count}} результатів)",
+    "placeholders": {
+      "quickSearch": "Пошук турів за назвою, описом або країною...",
+      "search": "Пошук турів..."
+    },
+    "filters": {
+      "country": "Країна",
+      "allCountries": "Всі країни",
+      "minPrice": "Мін. ціна",
+      "maxPrice": "Макс. ціна",
+      "startDate": "Дата початку",
+      "endDate": "Дата закінчення",
+      "sortBy": "Сортувати за"
+    },
+    "sort": {
+      "title": "Назвою",
+      "price": "Ціною",
+      "country": "Країною",
+      "startDate": "Датою початку",
+      "asc": "За зростанням",
+      "desc": "За спаданням"
+    }
+  },
+  "tours": {
+    "country": "Країна",
+    "price": "Ціна",
+    "startDate": "Дата початку",
+    "endDate": "Дата закінчення",
+    "operator": "Оператор",
+    "description": "Опис",
+    "title": "Назва",
+    "noTours": "Турів немає",
+    "noToursDescription": "Наразі немає турів для відображення",
+    "submitRequest": "Подати заявку",
+    "request": "Заявка",
+    "edit": "Редагувати",
+    "delete": "Видалити",
+    "yourTour": "Ваш тур",
+    "requestCreated": "Заявку успішно створено",
+    "requestError": "Помилка створення заявки",
+    "confirmDelete": "Ви впевнені, що хочете видалити цей тур?",
+    "tourDeleted": "Тур успішно видалено",
+    "deleteError": "Помилка видалення туру",
+    "dateNotSet": "Не встановлено",
+    "requestPending": "Заявка відправлена",
+    "requestApproved": "Заявка схвалена",
+    "requestRejected": "Заявка відхилена",
+    "requestSent": "Заявка надіслана",
+    "requestAlreadyExists": "У вас вже є заявка на цей тур",
+    "requestAlreadyExistsMessage": "Ви вже подали заявку на цей тур",
+    "status": {
+      "pending": "Очікує",
+      "approved": "Схвалено",
+      "rejected": "Відхилено"
+    }
+  },
+  "requests": {
+    "status": "Статус",
+    "status.pending": "Очікує",
+    "status.approved": "Схвалено",
+    "status.rejected": "Відхилено"
+  },
+  "createTourForm": {
+    "title": "Створити новий тур",
+    "success": "Тур успішно створено",
+    "error": "Помилка створення туру",
+    "userNotFound": "Користувача не знайдено",
+    "placeholders": {
+      "title": "Назва туру",
+      "description": "Опис туру",
+      "country": "Оберіть країну",
+      "price": "Ціна в грн"
+    },
+    "buttons": {
+      "create": "Створити тур",
+      "cancel": "Скасувати"
+    },
+    "errors": {
+      "titleRequired": "Назва обов'язкова",
+      "descriptionRequired": "Опис обов'язковий",
+      "countryRequired": "Країна обов'язкова",
+      "priceRequired": "Ціна обов'язкова",
+      "startDateRequired": "Дата початку обов'язкова",
+      "endDateRequired": "Дата закінчення обов'язкова",
+      "startDateMin": "Дата початку має бути в майбутньому",
+      "endDateMin": "Дата закінчення має бути після дати початку"
+    }
+  }
+}

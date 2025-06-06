@@ -6,14 +6,8 @@ const userSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
   role: { type: String, enum: ['agent', 'operator'], required: true },
-
-  // Додаємо поле для підписок (тільки для agent)
-  subscriptions: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User'
-  }],
-}, { timestamps: true });
-
+  subscriptions: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Subscription'}]}, { timestamps: true }
+);
 // Хешування пароля перед збереженням
 userSchema.pre('save', async function (next) {
   if (!this.isModified('password')) return next();

@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { protect, authorizeRoles } = require('../middleware/authMiddleware');
+const { protect } = require('../middleware/authMiddleware');
 const {
   getRequests,
   getRequestById,
@@ -14,6 +14,6 @@ router.route('/')
 
 router.route('/:id')
   .get(protect, getRequestById)
-  .delete(protect, authorizeRoles('operator'), deleteRequest);
+  .delete(protect, deleteRequest);
 
 module.exports = router;

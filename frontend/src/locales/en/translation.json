@@ -67,7 +67,8 @@
     "availableTours": "Available Tours",
     "submitRequest": "Submit Request",
     "requestAdded": "Request added successfully",
-    "requestAddError": "Failed to add request"
+    "requestAddError": "Failed to add request",
+    "requestsLoadError": "Failed to load requests"
   },
   "operatorDashboard": {
     "allTours": "All Tours",
@@ -84,6 +85,12 @@
     "requestDeleted": "Request deleted successfully",
     "requestDeleteError": "Failed to delete request",
     "requestsLoadError": "Failed to load requests",
+    "requestStatusUpdated": "Request status updated successfully",
+    "requestStatusPending": "Request marked as pending",
+    "requestStatusApproved": "Request approved successfully",
+    "requestStatusRejected": "Request rejected successfully",
+    "requestStatusUpdateError": "Failed to update request status",
+    "tourListRefreshed": "Tour list refreshed",
     "client": "Client",
     "tour": "Tour",
     "email": "Email",

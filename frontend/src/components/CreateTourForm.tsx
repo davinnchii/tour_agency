@@ -8,6 +8,7 @@ import { addTour } from "../features/tours/tourSlice"
 import Select from "react-select"
 import { useTranslation } from "react-i18next"
 import { useAppDispatch, useAppSelector } from "@/app/store"
+import { toastSuccess, toastError } from "../utils/toast"
 import type { CreateTourPayload, User } from "../types"
 
 interface CountryOption {
@@ -29,8 +30,8 @@ interface FormData {
   description: string
   country: CountryOption
   price: number
-  startDate: string
-  endDate: string
+  startDate: string // HTML date input returns string
+  endDate: string // HTML date input returns string
 }
 
 interface CreateTourFormProps {
@@ -41,6 +42,7 @@ export const CreateTourForm: React.FC<CreateTourFormProps> = ({ onClose }) => {
   const { t } = useTranslation()
   const dispatch = useAppDispatch()
   const user = useAppSelector((state) => state.auth.user)
+  const { loading } = useAppSelector((state) => state.tours)
 
   const schema = yup.object().shape({
     title: yup.string().required(t("createTourForm.errors.titleRequired")).max(100),
@@ -48,13 +50,20 @@ export const CreateTourForm: React.FC<CreateTourFormProps> = ({ onClose }) => {
     country: yup.object().required(t("createTourForm.errors.countryRequired")),
     price: yup.number().required(t("createTourForm.errors.priceRequired")).min(1),
     startDate: yup
-      .date()
+      .string()
       .required(t("createTourForm.errors.startDateRequired"))
-      .min(new Date(), t("createTourForm.errors.startDateMin")),
+      .test("is-future", t("createTourForm.errors.startDateMin"), (value) => {
+        if (!value) return false
+        return new Date(value) >= new Date()
+      }),
     endDate: yup
-      .date()
+      .string()
       .required(t("createTourForm.errors.endDateRequired"))
-      .when("startDate", (startDate, schema) => schema.min(startDate, t("createTourForm.errors.endDateMin"))),
+      .test("is-after-start", t("createTourForm.errors.endDateMin"), function (value) {
+        const { startDate } = this.parent
+        if (!value || !startDate) return false
+        return new Date(value) > new Date(startDate)
+      }),
   })
 
   const resolver = useYupValidationResolver(schema)
@@ -69,33 +78,34 @@ export const CreateTourForm: React.FC<CreateTourFormProps> = ({ onClose }) => {
 
   const onSubmit = async (data: FormData): Promise<void> => {
     if (!user) {
-      alert(t("createTourForm.userNotFound"))
+      toastError(t("createTourForm.userNotFound"))
       return
     }
 
+    // Convert form data to API payload
     const payload: CreateTourPayload = {
       title: data.title,
       description: data.description,
       country: data.country.value,
       price: Number(data.price),
-      startDate: data.startDate,
-      endDate: data.endDate,
-      operator: user as User
-    }    
+      startDate: data.startDate, // Already a string from HTML input
+      endDate: data.endDate, // Already a string from HTML input
+      operator: user as User, // Use 'id' to match backend format
+    }
 
     try {
       await dispatch(addTour(payload)).unwrap()
-      alert(t("createTourForm.success"))
+      toastSuccess(t("createTourForm.success"))
       reset()
       onClose()
     } catch (err) {
       console.error(err)
-      alert(t("createTourForm.error"))
+      toastError(t("createTourForm.error"))
     }
   }
 
   return (
-    <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+    <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
       <div className="bg-white rounded-xl shadow-lg p-6 w-full max-w-md">
         <h3 className="text-lg font-bold mb-4">{t("createTourForm.title")}</h3>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
@@ -150,8 +160,12 @@ export const CreateTourForm: React.FC<CreateTourFormProps> = ({ onClose }) => {
           </div>
 
           <div className="flex justify-between pt-2">
-            <button type="submit" className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
-              {t("createTourForm.buttons.create")}
+            <button
+              type="submit"
+              disabled={loading}
+              className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 disabled:opacity-50"
+            >
+              {loading ? t("common.loading") : t("createTourForm.buttons.create")}
             </button>
             <button type="button" className="bg-gray-300 px-4 py-2 rounded hover:bg-gray-400" onClick={onClose}>
               {t("createTourForm.buttons.cancel")}

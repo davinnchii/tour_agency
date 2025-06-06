@@ -8,9 +8,9 @@ import { fetchTours } from "../features/tours/tourSlice"
 import { fetchSubscriptions, addSubscription, removeSubscription } from "../features/subscriptions/subscriptionSlice"
 import { fetchRequests, removeRequest } from "@/features/requests/requestsSlice"
 import { getOperators } from "../features/users/userSlice"
-
-import type { User, Subscription, PopulatedRequest, Request } from "@/types"
+import { toastSuccess, toastError } from "../utils/toast"
 import TourSearchResults from "./TourSearchResult"
+import type { User, PopulatedSubscription, PopulatedRequest } from "../types"
 
 const AgentDashboard: React.FC = () => {
   const { t } = useTranslation()
@@ -18,37 +18,36 @@ const AgentDashboard: React.FC = () => {
 
   const user = useAppSelector((state) => state.auth.user)
   const { operators, loading } = useAppSelector((state) => state.users)
-  const subscriptions = useAppSelector((state) => state.subscriptions.subscriptions) as Subscription[]
-  const { requests, loaded } = useAppSelector((state) => state.requests)
+  const subscriptions = useAppSelector((state) => state.subscriptions.subscriptions) as PopulatedSubscription[]
+  const { requests, loaded, loading: requestsLoading } = useAppSelector((state) => state.requests)
 
-  const [activeTab, setActiveTab] = useState<"tours" | "operators" | "requests">("tours")  
-
-  const userRequests = requests.filter(req => {
-    return req.agency == user?._id
-});
+  const [activeTab, setActiveTab] = useState<"tours" | "operators" | "requests">("tours")
 
   useEffect(() => {
     dispatch(getOperators()).unwrap()
     dispatch(fetchTours()).unwrap()
     dispatch(fetchSubscriptions()).unwrap()
-    dispatch(fetchRequests()).unwrap()
-  }, [dispatch])
+    // Fetch requests immediately for agents to check existing requests
+    if (user?.role === "agent") {
+      dispatch(fetchRequests()).unwrap()
+    }
+  }, [dispatch, user?.role])
 
   const handleSubscribe = async (operator: User): Promise<void> => {
     if (!user) return
 
     const data = {
-      agency: user._id,
+      agency: user._id, // Use 'id' to match backend format
       operator: operator._id,
     }
 
     try {
       await dispatch(addSubscription(data)).unwrap()
       await dispatch(fetchSubscriptions()).unwrap()
-      alert(t("agentDashboard.subscriptionCreated"))
+      toastSuccess(t("agentDashboard.subscriptionCreated"))
     } catch (err) {
       console.error(t("agentDashboard.subscriptionCreateError"), err)
-      alert(t("agentDashboard.subscriptionCreateErrorAlert"))
+      toastError(t("agentDashboard.subscriptionCreateErrorAlert"))
     }
   }
 
@@ -56,20 +55,20 @@ const AgentDashboard: React.FC = () => {
     try {
       await dispatch(removeSubscription(id)).unwrap()
       await dispatch(fetchSubscriptions()).unwrap()
-      alert(t("agentDashboard.subscriptionDeleted"))
+      toastSuccess(t("agentDashboard.subscriptionDeleted"))
     } catch (err) {
       console.error(t("agentDashboard.subscriptionDeleteError"), err)
+      toastError(t("agentDashboard.subscriptionDeleteError"))
     }
   }
 
   const handleDeleteRequest = async (id: string): Promise<void> => {
     try {
       await dispatch(removeRequest(id)).unwrap()
-      await dispatch(fetchRequests()).unwrap()
-      alert(t("agentDashboard.requestDeleted"))
+      toastSuccess(t("agentDashboard.requestDeleted"))
     } catch (err) {
       console.error(err)
-      alert(t("agentDashboard.requestDeleteError"))
+      toastError(t("agentDashboard.requestDeleteError"))
     }
   }
 
@@ -79,9 +78,13 @@ const AgentDashboard: React.FC = () => {
         await dispatch(fetchRequests()).unwrap()
       } catch (err) {
         console.error(err)
+        toastError(t("agentDashboard.requestsLoadError"))
       }
     }
   }
+
+  // Filter requests for current user
+  const userRequests = requests.filter((request) => request.createdBy._id === user?._id)
 
   if (!user) {
     return <div>{t("common.loading")}</div>
@@ -123,13 +126,13 @@ const AgentDashboard: React.FC = () => {
                 : "border-transparent text-gray-500 hover:text-gray-700"
             }`}
           >
-            {t("agentDashboard.myRequests")}
+            {t("agentDashboard.myRequests")} ({userRequests.length})
           </button>
         </nav>
       </div>
 
       {/* Tab Content */}
-      {activeTab === "tours" && <TourSearchResults userRequests={userRequests}  />}
+      {activeTab === "tours" && <TourSearchResults userRequests={userRequests} />}
 
       {activeTab === "operators" && (
         <div>
@@ -154,13 +157,18 @@ const AgentDashboard: React.FC = () => {
                             const sub = subscriptions.find((s) => s.operator && s.operator._id === op._id)
                             if (sub) handleDeleteSubscription(sub._id)
                           }}
-                          className="btn bg-red-500 text-white hover:bg-red-600"
+                          disabled={loading}
+                          className="btn bg-red-500 text-white hover:bg-red-600 disabled:opacity-50"
                         >
-                          {t("agentDashboard.unsubscribe")}
+                          {loading ? t("common.loading") : t("agentDashboard.unsubscribe")}
                         </button>
                       ) : (
-                        <button onClick={() => handleSubscribe(op)} className="btn btn-primary">
-                          {t("agentDashboard.subscribe")}
+                        <button
+                          onClick={() => handleSubscribe(op)}
+                          disabled={loading}
+                          className="btn btn-primary disabled:opacity-50"
+                        >
+                          {loading ? t("common.loading") : t("agentDashboard.subscribe")}
                         </button>
                       )}
                     </div>
@@ -175,13 +183,13 @@ const AgentDashboard: React.FC = () => {
       {activeTab === "requests" && (
         <div>
           <h3 className="text-lg font-semibold mb-4">{t("agentDashboard.yourRequests")}</h3>
-          {requests.length === 0 ? (
+          {userRequests.length === 0 ? (
             <div className="text-center py-8">
               <p className="text-gray-600">{t("agentDashboard.noRequests")}</p>
             </div>
           ) : (
             <div className="space-y-4">
-              {(requests as Request[]).map((req) => (
+              {(userRequests as PopulatedRequest[]).map((req) => (
                 <div key={req._id} className="card flex justify-between items-center">
                   <div>
                     <p className="font-semibold">{req.tour.title}</p>
@@ -189,14 +197,26 @@ const AgentDashboard: React.FC = () => {
                       {req.tour.country} • {req.tour.price} грн
                     </p>
                     <p className="text-xs text-gray-500">
-                      {t("requests.status")}: {t(`requests.status.${req.status}`)}
+                      {t("requests.status")}:
+                      <span
+                        className={`ml-1 px-2 py-1 rounded text-xs ${
+                          req.status === "pending"
+                            ? "bg-yellow-100 text-yellow-800"
+                            : req.status === "approved"
+                              ? "bg-green-100 text-green-800"
+                              : "bg-red-100 text-red-800"
+                        }`}
+                      >
+                        {t(`requests.status.${req.status}`)}
+                      </span>
                     </p>
                   </div>
                   <button
                     onClick={() => handleDeleteRequest(req._id)}
-                    className="btn bg-red-500 text-white hover:bg-red-600"
+                    disabled={requestsLoading}
+                    className="btn bg-red-500 text-white hover:bg-red-600 disabled:opacity-50"
                   >
-                    {t("agentDashboard.delete")}
+                    {requestsLoading ? t("common.loading") : t("agentDashboard.delete")}
                   </button>
                 </div>
               ))}

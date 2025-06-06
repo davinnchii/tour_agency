@@ -67,7 +67,8 @@
     "availableTours": "Доступні тури",
     "submitRequest": "Подати заявку",
     "requestAdded": "Заявку успішно додано",
-    "requestAddError": "Помилка додавання заявки"
+    "requestAddError": "Помилка додавання заявки",
+    "requestsLoadError": "Помилка завантаження заявок"
   },
   "operatorDashboard": {
     "allTours": "Всі тури",

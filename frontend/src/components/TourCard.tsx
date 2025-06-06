@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next"
 import { useAppDispatch, useAppSelector } from "@/app/store"
 import { addRequest } from "@/features/requests/requestsSlice"
 import { removeTour } from "../features/tours/tourSlice"
+import { toastSuccess, toastError } from "../utils/toast"
 import type { Tour, PopulatedTour, Request } from "../types"
 
 interface TourCardProps {
@@ -25,11 +26,11 @@ const TourCard: React.FC<TourCardProps> = ({ tour, variant = "default", showActi
   const isOwner = isOperator && typeof tour.operator === "object" && tour.operator._id === user._id
 
   // Check if current user already has a request for this tour
-  const existingRequest = userRequests?.find((request: Request) => {
+  const existingRequest = userRequests.find((request) => {
     // Handle both string and object references for tour
-    const tourId = typeof request.tour === "string" ? request.tour : request.tour._id    
+    const tourId = typeof request.tour === "string" ? request.tour : request.tour._id
     return tourId === tour._id && request.createdBy._id === user?._id
-  })  
+  })
 
   const hasExistingRequest = !!existingRequest
   const requestStatus = existingRequest?.status
@@ -46,10 +47,10 @@ const TourCard: React.FC<TourCardProps> = ({ tour, variant = "default", showActi
 
     try {
       await dispatch(addRequest(requestData)).unwrap()
-      alert(t("tours.requestCreated"))
+      toastSuccess(t("tours.requestCreated"))
     } catch (error) {
       console.error("Failed to create request:", error)
-      alert(t("tours.requestError"))
+      toastError(t("tours.requestError"))
     }
   }
 
@@ -59,10 +60,10 @@ const TourCard: React.FC<TourCardProps> = ({ tour, variant = "default", showActi
     if (window.confirm(t("tours.confirmDelete"))) {
       try {
         await dispatch(removeTour(tour._id)).unwrap()
-        alert(t("tours.tourDeleted"))
+        toastSuccess(t("tours.tourDeleted"))
       } catch (error) {
         console.error("Failed to delete tour:", error)
-        alert(t("tours.deleteError"))
+        toastError(t("tours.deleteError"))
       }
     }
   }

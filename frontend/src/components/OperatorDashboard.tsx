@@ -5,17 +5,18 @@ import { useEffect, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { useAppDispatch, useAppSelector } from "@/app/store"
 import { fetchTours } from "../features/tours/tourSlice"
-import { fetchRequests, removeRequest } from "@/features/requests/requestsSlice"
+import { fetchRequests, removeRequest, updateRequestStatus } from "@/features/requests/requestsSlice"
+import { toastSuccess, toastError, toastInfo } from "../utils/toast"
 import { CreateTourForm } from "./CreateTourForm"
-import TourSearchResults from "@/components/TourSearchResult";
-import type { PopulatedRequest, Request } from "../types"
+import TourSearchResults from "@/components/TourSearchResult"
+import type { PopulatedRequest } from "../types"
 
 const OperatorDashboard: React.FC = () => {
   const { t } = useTranslation()
   const dispatch = useAppDispatch()
 
   const user = useAppSelector((state) => state.auth.user)
-  const { requests, loaded } = useAppSelector((state) => state.requests)
+  const { requests, loaded, loading } = useAppSelector((state) => state.requests)
 
   const [activeTab, setActiveTab] = useState<"tours" | "requests" | "create">("tours")
   const [showModal, setShowModal] = useState<boolean>(false)
@@ -24,15 +25,30 @@ const OperatorDashboard: React.FC = () => {
     dispatch(fetchTours()).unwrap()
   }, [dispatch])
 
-
   const handleDeleteRequest = async (id: string): Promise<void> => {
     try {
       await dispatch(removeRequest(id)).unwrap()
-      await dispatch(fetchRequests()).unwrap()
-      alert(t("operatorDashboard.requestDeleted"))
+      toastSuccess(t("operatorDashboard.requestDeleted"))
     } catch (err) {
       console.error(err)
-      alert(t("operatorDashboard.requestDeleteError"))
+      toastError(t("operatorDashboard.requestDeleteError"))
+    }
+  }
+
+  const handleUpdateRequestStatus = async (id: string, status: "pending" | "approved" | "rejected"): Promise<void> => {
+    try {
+      dispatch(updateRequestStatus({ id, status }));
+
+      const statusMessages = {
+        pending: t("operatorDashboard.requestStatusPending"),
+        approved: t("operatorDashboard.requestStatusApproved"),
+        rejected: t("operatorDashboard.requestStatusRejected"),
+      }
+
+      toastSuccess(statusMessages[status] || t("operatorDashboard.requestStatusUpdated"))
+    } catch (err) {
+      console.error(err)
+      toastError(t("operatorDashboard.requestStatusUpdateError"))
     }
   }
 
@@ -42,6 +58,7 @@ const OperatorDashboard: React.FC = () => {
         await dispatch(fetchRequests()).unwrap()
       } catch (err) {
         console.error(t("operatorDashboard.requestsLoadError"), err)
+        toastError(t("operatorDashboard.requestsLoadError"))
       }
     }
   }
@@ -49,10 +66,11 @@ const OperatorDashboard: React.FC = () => {
   const handleCloseModal = async (): Promise<void> => {
     await dispatch(fetchTours()).unwrap()
     setShowModal(false)
+    toastInfo(t("operatorDashboard.tourListRefreshed"))
   }
 
   const operatorRequests = requests.filter((req) => {
-    const populatedReq = req as Request
+    const populatedReq = req as PopulatedRequest
     return populatedReq.tour?.operator?._id === user?._id
   })
 
@@ -121,7 +139,7 @@ const OperatorDashboard: React.FC = () => {
           ) : (
             <div className="space-y-4">
               {operatorRequests.map((req) => {
-                const populatedReq = req as Request
+                const populatedReq = req as PopulatedRequest
                 return (
                   <div key={req._id} className="card">
                     <div className="flex justify-between items-start">
@@ -155,12 +173,50 @@ const OperatorDashboard: React.FC = () => {
                             <span className="ml-2 font-bold text-blue-600">{populatedReq.tour.price} грн</span>
                           </div>
                         </div>
+
+                        {/* Status update buttons */}
+                        <div className="mt-4 flex gap-2">
+                          <button
+                            onClick={() => handleUpdateRequestStatus(req._id, "approved")}
+                            disabled={req.status === "approved" || loading}
+                            className={`px-3 py-1 text-sm rounded ${
+                              req.status === "approved"
+                                ? "bg-gray-200 text-gray-500 cursor-not-allowed"
+                                : "bg-green-500 text-white hover:bg-green-600"
+                            }`}
+                          >
+                            {t("requests.approve")}
+                          </button>
+                          <button
+                            onClick={() => handleUpdateRequestStatus(req._id, "rejected")}
+                            disabled={req.status === "rejected" || loading}
+                            className={`px-3 py-1 text-sm rounded ${
+                              req.status === "rejected"
+                                ? "bg-gray-200 text-gray-500 cursor-not-allowed"
+                                : "bg-red-500 text-white hover:bg-red-600"
+                            }`}
+                          >
+                            {t("requests.reject")}
+                          </button>
+                          <button
+                            onClick={() => handleUpdateRequestStatus(req._id, "pending")}
+                            disabled={req.status === "pending" || loading}
+                            className={`px-3 py-1 text-sm rounded ${
+                              req.status === "pending"
+                                ? "bg-gray-200 text-gray-500 cursor-not-allowed"
+                                : "bg-yellow-500 text-white hover:bg-yellow-600"
+                            }`}
+                          >
+                            {t("requests.markPending")}
+                          </button>
+                        </div>
                       </div>
                       <button
                         onClick={() => handleDeleteRequest(req._id)}
-                        className="btn bg-red-500 text-white hover:bg-red-600 ml-4"
+                        disabled={loading}
+                        className="btn bg-red-500 text-white hover:bg-red-600 ml-4 disabled:opacity-50"
                       >
-                        {t("operatorDashboard.delete")}
+                        {loading ? t("common.loading") : t("operatorDashboard.delete")}
                       </button>
                     </div>
                   </div>

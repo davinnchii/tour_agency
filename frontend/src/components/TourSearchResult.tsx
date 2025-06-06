@@ -1,19 +1,26 @@
-"use client"
+"use client";
 
-import type React from "react"
-import { useTranslation } from "react-i18next"
-import { useAppSelector } from "@/app/store"
-import TourCard from "./TourCard"
-import TourSearch from "./TourSearch"
-import { useState } from "react"
+import type React from "react";
+import { useTranslation } from "react-i18next";
+import { useAppSelector } from "@/app/store";
+import TourCard from "./TourCard";
+import TourSearch from "./TourSearch";
+import { useState } from "react";
+import { Request } from "@/types";
 
-const TourSearchResults: React.FC = () => {
-  const { t } = useTranslation()
-  const { searchResults, searchLoading, tours } = useAppSelector((state) => state.tours)
-  const [hasSearchResults, setHasSearchResults] = useState(false)
+type Props = {
+  userRequests?: Request[];
+};
 
-  const displayTours = hasSearchResults ? searchResults : tours
-  const isSearchActive = hasSearchResults
+const TourSearchResults: React.FC<Props> = ({ userRequests }) => {
+  const { t } = useTranslation();
+  const { searchResults, searchLoading, tours } = useAppSelector(
+    (state) => state.tours
+  );
+  const [hasSearchResults, setHasSearchResults] = useState(false);
+
+  const displayTours = hasSearchResults ? searchResults : tours;
+  const isSearchActive = hasSearchResults;
 
   if (searchLoading) {
     return (
@@ -32,7 +39,7 @@ const TourSearchResults: React.FC = () => {
           ))}
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -41,9 +48,13 @@ const TourSearchResults: React.FC = () => {
 
       {isSearchActive && (
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-          <h4 className="font-medium text-blue-900 mb-1">{t("search.resultsTitle")}</h4>
+          <h4 className="font-medium text-blue-900 mb-1">
+            {t("search.resultsTitle")}
+          </h4>
           <p className="text-blue-700 text-sm">
-            {displayTours.length > 0 ? t("search.resultsCount", { count: displayTours.length }) : t("search.noResults")}
+            {displayTours.length > 0
+              ? t("search.resultsCount", { count: displayTours.length })
+              : t("search.noResults")}
           </p>
         </div>
       )}
@@ -55,18 +66,25 @@ const TourSearchResults: React.FC = () => {
             {isSearchActive ? t("search.noResults") : t("tours.noTours")}
           </h3>
           <p className="text-gray-600">
-            {isSearchActive ? t("search.tryDifferentFilters") : t("tours.noToursDescription")}
+            {isSearchActive
+              ? t("search.tryDifferentFilters")
+              : t("tours.noToursDescription")}
           </p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {displayTours.map((tour) => (
-            <TourCard variant="compact" key={tour._id} tour={tour} />
+            <TourCard
+              variant="default"
+              key={tour._id}
+              tour={tour}
+              userRequests={userRequests}
+            />
           ))}
         </div>
       )}
     </div>
-  )
-}
+  );
+};
 
-export default TourSearchResults
+export default TourSearchResults;

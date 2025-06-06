@@ -27,7 +27,7 @@ export interface Tour extends BaseDocument {
   price: number
   startDate?: string // ISO date string from database
   endDate?: string // ISO date string from database
-  operator: string // ObjectId reference
+  operator: User // ObjectId reference
 }
 
 // Populated tour (when operator is populated)
@@ -41,9 +41,9 @@ export interface Request extends BaseDocument {
   customerName: string
   customerEmail: string
   status: "pending" | "approved" | "rejected"
-  createdBy: string // ObjectId reference
-  agency?: string // ObjectId reference (optional)
-  operator?: string // ObjectId reference (optional)
+  createdBy: User // ObjectId reference
+  agency?: User // ObjectId reference (optional)
+  operator?: User // ObjectId reference (optional)
 }
 
 // Populated request (when references are populated)
@@ -104,7 +104,7 @@ export interface CreateTourPayload {
   price: number
   startDate?: string // ISO string for API
   endDate?: string // ISO string for API
-  operator: string
+  operator: User
 }
 
 export interface CreateRequestPayload {

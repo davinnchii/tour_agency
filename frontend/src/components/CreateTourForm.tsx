@@ -8,7 +8,7 @@ import { addTour } from "../features/tours/tourSlice"
 import Select from "react-select"
 import { useTranslation } from "react-i18next"
 import { useAppDispatch, useAppSelector } from "@/app/store"
-import type { CreateTourPayload } from "../types"
+import type { CreateTourPayload, User } from "../types"
 
 interface CountryOption {
   value: string
@@ -80,6 +80,7 @@ export const CreateTourForm: React.FC<CreateTourFormProps> = ({ onClose }) => {
       price: Number(data.price),
       startDate: data.startDate,
       endDate: data.endDate,
+      operator: user as User
     }    
 
     try {
@@ -94,7 +95,7 @@ export const CreateTourForm: React.FC<CreateTourFormProps> = ({ onClose }) => {
   }
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+    <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
       <div className="bg-white rounded-xl shadow-lg p-6 w-full max-w-md">
         <h3 className="text-lg font-bold mb-4">{t("createTourForm.title")}</h3>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">

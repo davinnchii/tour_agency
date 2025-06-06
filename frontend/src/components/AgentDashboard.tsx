@@ -21,12 +21,17 @@ const AgentDashboard: React.FC = () => {
   const subscriptions = useAppSelector((state) => state.subscriptions.subscriptions) as Subscription[]
   const { requests, loaded } = useAppSelector((state) => state.requests)
 
-  const [activeTab, setActiveTab] = useState<"tours" | "operators" | "requests">("tours")
+  const [activeTab, setActiveTab] = useState<"tours" | "operators" | "requests">("tours")  
+
+  const userRequests = requests.filter(req => {
+    return req.agency == user?._id
+});
 
   useEffect(() => {
     dispatch(getOperators()).unwrap()
     dispatch(fetchTours()).unwrap()
     dispatch(fetchSubscriptions()).unwrap()
+    dispatch(fetchRequests()).unwrap()
   }, [dispatch])
 
   const handleSubscribe = async (operator: User): Promise<void> => {
@@ -34,7 +39,7 @@ const AgentDashboard: React.FC = () => {
 
     const data = {
       agency: user._id,
-      operatorId: operator._id,
+      operator: operator._id,
     }
 
     try {
@@ -124,7 +129,7 @@ const AgentDashboard: React.FC = () => {
       </div>
 
       {/* Tab Content */}
-      {activeTab === "tours" && <TourSearchResults />}
+      {activeTab === "tours" && <TourSearchResults userRequests={userRequests}  />}
 
       {activeTab === "operators" && (
         <div>

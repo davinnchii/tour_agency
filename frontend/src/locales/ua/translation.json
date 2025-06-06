@@ -144,7 +144,18 @@
     "confirmDelete": "Ви впевнені, що хочете видалити цей тур?",
     "tourDeleted": "Тур успішно видалено",
     "deleteError": "Помилка видалення туру",
-    "dateNotSet": "Не встановлено"
+    "dateNotSet": "Не встановлено",
+    "requestPending": "Заявка відправлена",
+    "requestApproved": "Заявка схвалена",
+    "requestRejected": "Заявка відхилена",
+    "requestSent": "Заявка надіслана",
+    "requestAlreadyExists": "У вас вже є заявка на цей тур",
+    "requestAlreadyExistsMessage": "Ви вже подали заявку на цей тур",
+    "status": {
+      "pending": "Очікує",
+      "approved": "Схвалено",
+      "rejected": "Відхилено"
+    }
   },
   "requests": {
     "status": "Статус",

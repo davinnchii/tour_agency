@@ -1,56 +1,29 @@
 "use client"
 
 import type React from "react"
-import { useEffect, useMemo, useState } from "react"
-import { removeTour, fetchTours } from "../features/tours/tourSlice"
-import { fetchRequests, removeRequest } from "@/features/requests/requestsSlice"
-import { CreateTourForm } from "./CreateTourForm"
+import { useEffect, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { useAppDispatch, useAppSelector } from "@/app/store"
-import type { Request, Tour } from "@/types"
+import { fetchTours } from "../features/tours/tourSlice"
+import { fetchRequests, removeRequest } from "@/features/requests/requestsSlice"
+import { CreateTourForm } from "./CreateTourForm"
+import TourSearchResults from "@/components/TourSearchResult";
+import type { PopulatedRequest, Request } from "../types"
 
 const OperatorDashboard: React.FC = () => {
   const { t } = useTranslation()
   const dispatch = useAppDispatch()
-  const tours = useAppSelector((state) => state.tours.tours) as Tour[]
-  const { requests, loaded } = useAppSelector((state) => state.requests)
-  const user = useAppSelector((state) => state.auth.user)
 
-  const [showRequests, setShowRequests] = useState<boolean>(false)
+  const user = useAppSelector((state) => state.auth.user)
+  const { requests, loaded } = useAppSelector((state) => state.requests)
+
+  const [activeTab, setActiveTab] = useState<"tours" | "requests" | "create">("tours")
   const [showModal, setShowModal] = useState<boolean>(false)
 
   useEffect(() => {
     dispatch(fetchTours()).unwrap()
   }, [dispatch])
 
-  const handleDeleteTour = async (tourId: string): Promise<void> => {
-    if (!tourId) return
-
-    try {
-      await dispatch(removeTour(tourId)).unwrap()
-      alert(t("operatorDashboard.tourDeleted"))
-    } catch (err) {
-      console.error(err)
-      alert(t("operatorDashboard.tourDeleteError"))
-    }
-  }
-
-  const handleFetchRequests = async (): Promise<void> => {
-    if (showRequests) {
-      setShowRequests(false)
-      return
-    }
-
-    if (!loaded) {
-      try {
-        await dispatch(fetchRequests()).unwrap()
-      } catch (err) {
-        console.error(t("operatorDashboard.requestsLoadError"), err)
-      }
-    }
-
-    setShowRequests(true)
-  }
 
   const handleDeleteRequest = async (id: string): Promise<void> => {
     try {
@@ -63,100 +36,137 @@ const OperatorDashboard: React.FC = () => {
     }
   }
 
-  const handleCloseModal = async (): Promise<void> => {
-    await dispatch(fetchTours()).unwrap()
-    setShowModal(!showModal)
+  const handleFetchRequests = async (): Promise<void> => {
+    if (!loaded) {
+      try {
+        await dispatch(fetchRequests()).unwrap()
+      } catch (err) {
+        console.error(t("operatorDashboard.requestsLoadError"), err)
+      }
+    }
   }
 
-  console.log(tours, user);
+  const handleCloseModal = async (): Promise<void> => {
+    await dispatch(fetchTours()).unwrap()
+    setShowModal(false)
+  }
 
-
-  const operatorRequests = useMemo(() => {
-    if (!user) return []
-    return (requests as Request[]).filter((req) => req.tour?.operator?._id === user._id)
-  }, [requests, user])
+  const operatorRequests = requests.filter((req) => {
+    const populatedReq = req as Request
+    return populatedReq.tour?.operator?._id === user?._id
+  })
 
   if (!user) {
     return <div>{t("common.loading")}</div>
   }
 
   return (
-    <div>
-      <h2 className="text-xl font-semibold mb-4">{t("operatorDashboard.dashboardTitle")}</h2>
-
-      <div className="space-y-3 mb-6">
-        <button
-          className="w-full bg-green-500 text-white py-2 rounded hover:bg-green-600 transition"
-          onClick={() => setShowModal(true)}
-        >
-          {t("operatorDashboard.createTour")}
-        </button>
-        <button
-          className="w-full bg-purple-500 text-white py-2 rounded hover:bg-purple-600 transition"
-          onClick={handleFetchRequests}
-        >
-          {showRequests ? t("operatorDashboard.hideRequests") : t("operatorDashboard.showRequests")}
-        </button>
+    <div className="space-y-6">
+      {/* Navigation Tabs */}
+      <div className="border-b">
+        <nav className="flex space-x-8">
+          <button
+            onClick={() => setActiveTab("tours")}
+            className={`py-2 px-1 border-b-2 font-medium text-sm ${
+              activeTab === "tours"
+                ? "border-blue-500 text-blue-600"
+                : "border-transparent text-gray-500 hover:text-gray-700"
+            }`}
+          >
+            {t("operatorDashboard.allTours")}
+          </button>
+          <button
+            onClick={() => setActiveTab("create")}
+            className={`py-2 px-1 border-b-2 font-medium text-sm ${
+              activeTab === "create"
+                ? "border-blue-500 text-blue-600"
+                : "border-transparent text-gray-500 hover:text-gray-700"
+            }`}
+          >
+            {t("operatorDashboard.createTour")}
+          </button>
+          <button
+            onClick={() => {
+              setActiveTab("requests")
+              handleFetchRequests()
+            }}
+            className={`py-2 px-1 border-b-2 font-medium text-sm ${
+              activeTab === "requests"
+                ? "border-blue-500 text-blue-600"
+                : "border-transparent text-gray-500 hover:text-gray-700"
+            }`}
+          >
+            {t("operatorDashboard.requests")} ({operatorRequests.length})
+          </button>
+        </nav>
       </div>
-      {showModal && <CreateTourForm onClose={handleCloseModal} />}
 
-      {/* Tour Overview */}
-      {tours.length > 0 && (
-        <div className="mb-6">
-          <h3 className="text-lg font-bold mb-2">{t("operatorDashboard.yourTours")}</h3>
-          <ul className="space-y-2">
-            {tours
-              .filter((tour) => tour.operator._id === user.id)
-              .map((tour) => (
-                <li key={tour._id} className="border p-3 rounded flex justify-between items-center">
-                  <div>
-                    <p className="font-semibold">{tour.title}</p>
-                    <p className="text-sm text-gray-600">
-                      {tour.country}, {tour.price} грн
-                    </p>
-                  </div>
-                  <button
-                    className="px-4 bg-red-500 text-white py-1 rounded hover:bg-red-600 transition"
-                    onClick={() => handleDeleteTour(tour._id)}
-                  >
-                    {t("operatorDashboard.deleteTour")}
-                  </button>
-                </li>
-              ))}
-          </ul>
+      {/* Tab Content */}
+      {activeTab === "tours" && <TourSearchResults />}
+
+      {activeTab === "create" && (
+        <div className="max-w-2xl">
+          <h3 className="text-lg font-semibold mb-4">{t("operatorDashboard.createNewTour")}</h3>
+          <CreateTourForm onClose={() => setActiveTab("tours")} />
         </div>
       )}
 
-      {/* Tour Requests */}
-      {showRequests && (
+      {activeTab === "requests" && (
         <div>
-          <h3 className="text-lg font-bold mb-2">{t("operatorDashboard.requestsOnTours")}</h3>
+          <h3 className="text-lg font-semibold mb-4">{t("operatorDashboard.requestsOnTours")}</h3>
           {operatorRequests.length === 0 ? (
-            <p>{t("operatorDashboard.noRequests")}</p>
+            <div className="text-center py-8">
+              <p className="text-gray-600">{t("operatorDashboard.noRequests")}</p>
+            </div>
           ) : (
-            <ul className="space-y-2">
-              {operatorRequests.map((req) => (
-                <li key={req._id} className="border p-3 rounded flex justify-between items-center">
-                  <div>
-                    <p>
-                      <strong>{t("operatorDashboard.client")}:</strong> {req.customerName}
-                    </p>
-                    <p>
-                      <strong>{t("operatorDashboard.tour")}:</strong> {req.tour.title} ({req.tour.country})
-                    </p>
-                    <p>
-                      <strong>{t("operatorDashboard.email")}:</strong> {req.customerEmail}
-                    </p>
+            <div className="space-y-4">
+              {operatorRequests.map((req) => {
+                const populatedReq = req as Request
+                return (
+                  <div key={req._id} className="card">
+                    <div className="flex justify-between items-start">
+                      <div className="flex-1">
+                        <h4 className="font-semibold text-lg mb-2">{populatedReq.tour.title}</h4>
+                        <div className="grid grid-cols-2 gap-4 text-sm">
+                          <div>
+                            <span className="font-medium">{t("operatorDashboard.client")}:</span>
+                            <span className="ml-2">{req.customerName}</span>
+                          </div>
+                          <div>
+                            <span className="font-medium">{t("operatorDashboard.email")}:</span>
+                            <span className="ml-2">{req.customerEmail}</span>
+                          </div>
+                          <div>
+                            <span className="font-medium">{t("requests.status")}:</span>
+                            <span
+                              className={`ml-2 px-2 py-1 rounded text-xs ${
+                                req.status === "pending"
+                                  ? "bg-yellow-100 text-yellow-800"
+                                  : req.status === "approved"
+                                    ? "bg-green-100 text-green-800"
+                                    : "bg-red-100 text-red-800"
+                              }`}
+                            >
+                              {t(`requests.status.${req.status}`)}
+                            </span>
+                          </div>
+                          <div>
+                            <span className="font-medium">{t("tours.price")}:</span>
+                            <span className="ml-2 font-bold text-blue-600">{populatedReq.tour.price} грн</span>
+                          </div>
+                        </div>
+                      </div>
+                      <button
+                        onClick={() => handleDeleteRequest(req._id)}
+                        className="btn bg-red-500 text-white hover:bg-red-600 ml-4"
+                      >
+                        {t("operatorDashboard.delete")}
+                      </button>
+                    </div>
                   </div>
-                  <button
-                    onClick={() => handleDeleteRequest(req._id)}
-                    className="text-sm bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
-                  >
-                    {t("operatorDashboard.delete")}
-                  </button>
-                </li>
-              ))}
-            </ul>
+                )
+              })}
+            </div>
           )}
         </div>
       )}

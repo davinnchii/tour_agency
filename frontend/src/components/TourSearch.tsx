@@ -3,7 +3,7 @@
 import type React from "react"
 import { useState, useEffect } from "react"
 import { useTranslation } from "react-i18next"
-import { useAppDispatch, useAppSelector } from "@/store"
+import { useAppDispatch, useAppSelector } from "../store"
 import { searchToursAsync, clearSearchResults } from "../features/tours/tourSlice"
 import type { TourSearchParams } from "../types"
 
@@ -33,17 +33,18 @@ const TourSearch: React.FC<TourSearchProps> = ({ onSearchResults }) => {
   const [showAdvanced, setShowAdvanced] = useState(false)
   const [isSearchActive, setIsSearchActive] = useState(false)
 
+  // Country options with English values and translated labels
   const countries = [
-    "Україна",
-    "Польща",
-    "Італія",
-    "Іспанія",
-    "Єгипет",
-    "Туреччина",
-    "Франція",
-    "Німеччина",
-    "Греція",
-    "Туніс",
+    { value: "Ukraine", label: t("countries.ukraine") },
+    { value: "Poland", label: t("countries.poland") },
+    { value: "Italy", label: t("countries.italy") },
+    { value: "Spain", label: t("countries.spain") },
+    { value: "Egypt", label: t("countries.egypt") },
+    { value: "Turkey", label: t("countries.turkey") },
+    { value: "France", label: t("countries.france") },
+    { value: "Germany", label: t("countries.germany") },
+    { value: "Greece", label: t("countries.greece") },
+    { value: "Tunisia", label: t("countries.tunisia") },
   ]
 
   const sortOptions = [
@@ -163,8 +164,8 @@ const TourSearch: React.FC<TourSearchProps> = ({ onSearchResults }) => {
               >
                 <option value="">{t("search.filters.allCountries")}</option>
                 {countries.map((country) => (
-                  <option key={country} value={country}>
-                    {country}
+                  <option key={country.value} value={country.value}>
+                    {country.label}
                   </option>
                 ))}
               </select>

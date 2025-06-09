@@ -3,23 +3,20 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
+  "homepage": "https://davinnchii.github.io/tour_agency",
   "scripts": {
-    "predeploy": "npm run build",
-    "deploy": "gh-pages -d dist",
     "dev": "vite",
     "build": "tsc -b && vite build",
     "preview": "vite preview",
-    "lint": "eslint . --ext .ts,.tsx"
+    "lint": "eslint . --ext .ts,.tsx",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d dist"
   },
   "dependencies": {
     "@reduxjs/toolkit": "^2.8.2",
-    "@tailwindcss/postcss": "^4.1.8",
-    "@tailwindcss/vite": "^4.1.8",
-    "autoprefixer": "^10.4.21",
     "axios": "^1.9.0",
     "i18next": "^25.2.1",
     "i18next-browser-languagedetector": "^8.1.0",
-    "postcss": "^8.5.4",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-hook-form": "^7.57.0",
@@ -28,11 +25,11 @@
     "react-router-dom": "^7.6.0",
     "react-select": "^5.10.1",
     "react-toastify": "^11.0.5",
-    "tailwindcss": "^4.1.8",
     "yup": "^1.6.1"
   },
   "devDependencies": {
     "@eslint/js": "^9.25.0",
+    "@tailwindcss/vite": "^4.1.8",
     "@types/node": "^22.15.29",
     "@types/react": "^19.1.2",
     "@types/react-dom": "^19.1.2",
@@ -40,8 +37,9 @@
     "eslint": "^9.25.0",
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.19",
-    "gh-pages": "^6.3.0",
+    "gh-pages": "^6.1.1",
     "globals": "^16.0.0",
+    "tailwindcss": "^4.1.8",
     "typescript": "~5.8.3",
     "vite": "^6.3.5"
   }

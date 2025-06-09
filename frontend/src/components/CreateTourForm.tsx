@@ -16,15 +16,6 @@ interface CountryOption {
   label: string
 }
 
-const countryOptions: CountryOption[] = [
-  { value: "Україна", label: "Україна" },
-  { value: "Польща", label: "Польща" },
-  { value: "Італія", label: "Італія" },
-  { value: "Іспанія", label: "Іспанія" },
-  { value: "Єгипет", label: "Єгипет" },
-  { value: "Туреччина", label: "Туреччина" },
-]
-
 interface FormData {
   title: string
   description: string
@@ -43,6 +34,19 @@ export const CreateTourForm: React.FC<CreateTourFormProps> = ({ onClose }) => {
   const dispatch = useAppDispatch()
   const user = useAppSelector((state) => state.auth.user)
   const { loading } = useAppSelector((state) => state.tours)
+
+  const countryOptions: CountryOption[] = [
+    { value: "Ukraine", label: t("countries.ukraine") },
+    { value: "Poland", label: t("countries.poland") },
+    { value: "Italy", label: t("countries.italy") },
+    { value: "Spain", label: t("countries.spain") },
+    { value: "Egypt", label: t("countries.egypt") },
+    { value: "Turkey", label: t("countries.turkey") },
+    { value: "France", label: t("countries.france") },
+    { value: "Germany", label: t("countries.germany") },
+    { value: "Greece", label: t("countries.greece") },
+    { value: "Tunisia", label: t("countries.tunisia") },
+  ]
 
   const schema = yup.object().shape({
     title: yup.string().required(t("createTourForm.errors.titleRequired")).max(100),
@@ -105,7 +109,7 @@ export const CreateTourForm: React.FC<CreateTourFormProps> = ({ onClose }) => {
   }
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+    <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
       <div className="bg-white rounded-xl shadow-lg p-6 w-full max-w-md">
         <h3 className="text-lg font-bold mb-4">{t("createTourForm.title")}</h3>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">

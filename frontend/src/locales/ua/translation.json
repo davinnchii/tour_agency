@@ -11,6 +11,18 @@
     "yes": "Так",
     "no": "Ні"
   },
+  "countries": {
+    "ukraine": "Україна",
+    "poland": "Польща",
+    "italy": "Італія",
+    "spain": "Іспанія",
+    "egypt": "Єгипет",
+    "turkey": "Туреччина",
+    "france": "Франція",
+    "germany": "Німеччина",
+    "greece": "Греція",
+    "tunisia": "Туніс"
+  },
   "auth": {
     "login": "Увійти",
     "logout": "Вийти",

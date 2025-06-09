@@ -5,6 +5,7 @@ import tailwindcss from '@tailwindcss/vite';
 
 export default defineConfig({
   plugins: [react(), tailwindcss()],
+
   css: {
     postcss: "./postcss.config.mjs",   
   },
@@ -15,5 +16,9 @@ export default defineConfig({
   },
   server: {
     port: 3000
-  }
+  },
+  build: {
+    outDir: "dist",
+    assetsDir: "assets",
+  },
 })

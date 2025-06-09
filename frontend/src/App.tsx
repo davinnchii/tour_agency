@@ -4,7 +4,7 @@ import type React from "react"
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom"
 import { Provider } from "react-redux"
 import { ToastContainer } from "react-toastify"
-import { store } from "@/store"
+import { store } from "./store"
 import ProtectedRoute from "./components/ProtectedRoute"
 import DashboardLayout from "@/pages/DashboardPage"
 import LoginPage from "@/pages/LoginPage"
@@ -16,7 +16,7 @@ import "react-toastify/dist/ReactToastify.css"
 const App: React.FC = () => {
   return (
     <Provider store={store}>
-      <Router>
+      <Router> {/* Add basename for GitHub Pages */}
         {/* Toast Container for notifications */}
         <ToastContainer
           position="top-right"

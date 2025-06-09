@@ -11,6 +11,18 @@
     "yes": "Yes",
     "no": "No"
   },
+  "countries": {
+    "ukraine": "Ukraine",
+    "poland": "Poland",
+    "italy": "Italy",
+    "spain": "Spain",
+    "egypt": "Egypt",
+    "turkey": "Turkey",
+    "france": "France",
+    "germany": "Germany",
+    "greece": "Greece",
+    "tunisia": "Tunisia"
+  },
   "auth": {
     "login": "Login",
     "logout": "Logout",

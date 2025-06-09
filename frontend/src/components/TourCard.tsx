@@ -2,10 +2,11 @@
 
 import type React from "react"
 import { useTranslation } from "react-i18next"
-import { useAppDispatch, useAppSelector } from "@/store"
+import { useAppDispatch, useAppSelector } from "../store"
 import { addRequest } from "@/features/requests/requestsSlice"
 import { removeTour } from "../features/tours/tourSlice"
 import { toastSuccess, toastError } from "../utils/toast"
+import { getCountryTranslationKey } from "../utils/countryHelpers"
 import type { Tour, PopulatedTour, Request } from "../types"
 import { useAppData } from "@/hooks"
 
@@ -13,15 +14,21 @@ interface TourCardProps {
   tour: Tour | PopulatedTour
   variant?: "default" | "compact"
   showActions?: boolean
-  userRequests?: Request[] // Add prop for user's requests
+  userRequests?: Request[]
+  onRequestCreated?: () => void
 }
 
-const TourCard: React.FC<TourCardProps> = ({ tour, variant = "default", showActions = true, userRequests = [] }) => {
+const TourCard: React.FC<TourCardProps> = ({
+  tour,
+  variant = "default",
+  showActions = true,
+  userRequests = [],
+}) => {
   const { t } = useTranslation()
   const dispatch = useAppDispatch()
   const user = useAppSelector((state) => state.auth.user)
-  const { loading } = useAppSelector((state) => state.requests)
-  const { refreshData } = useAppData()
+  const { loading: actionLoading } = useAppSelector((state) => state.requests)
+  const { refreshData } = useAppData();
 
   const isOperator = user?.role === "operator"
   const isAgent = user?.role === "agent"
@@ -29,7 +36,6 @@ const TourCard: React.FC<TourCardProps> = ({ tour, variant = "default", showActi
 
   // Check if current user already has a request for this tour
   const existingRequest = userRequests.find((request) => {
-    // Handle both string and object references for tour
     const tourId = typeof request.tour === "string" ? request.tour : request.tour._id
     return tourId === tour._id && request.createdBy._id === user?._id
   })
@@ -44,13 +50,13 @@ const TourCard: React.FC<TourCardProps> = ({ tour, variant = "default", showActi
       tour: tour._id,
       customerName: user.name,
       customerEmail: user.email,
-      createdBy: user._id, // Use 'id' to match backend format
+      createdBy: user._id,
     }
 
     try {
       await dispatch(addRequest(requestData)).unwrap()
-      await refreshData.requests()
       toastSuccess(t("tours.requestCreated"))
+      await refreshData.requests() 
     } catch (error) {
       console.error("Failed to create request:", error)
       toastError(t("tours.requestError"))
@@ -78,13 +84,21 @@ const TourCard: React.FC<TourCardProps> = ({ tour, variant = "default", showActi
 
   const operatorName = typeof tour.operator === "object" ? tour.operator.name : "Unknown Operator"
 
+  // Get translated country name
+  const getCountryDisplayName = (countryValue: string) => {
+    const translationKey = getCountryTranslationKey(countryValue)
+    const translated = t(translationKey)
+    // If translation key is not found, return the original value
+    return translated === translationKey ? countryValue : translated
+  }
+
   // Get button text and style based on request status
   const getRequestButtonProps = () => {
     if (!hasExistingRequest) {
       return {
         text: t("tours.submitRequest"),
         className: "btn btn-primary flex-1",
-        disabled: loading,
+        disabled: actionLoading,
       }
     }
 
@@ -124,7 +138,7 @@ const TourCard: React.FC<TourCardProps> = ({ tour, variant = "default", showActi
         <div className="flex justify-between items-start">
           <div className="flex-1">
             <h4 className="font-semibold text-lg mb-1">{tour.title}</h4>
-            <p className="text-sm text-gray-600 mb-2">{tour.country}</p>
+            <p className="text-sm text-gray-600 mb-2">{getCountryDisplayName(tour.country)}</p>
             <p className="text-lg font-bold text-blue-600">{tour.price} грн</p>
           </div>
           {showActions && isAgent && (
@@ -181,7 +195,7 @@ const TourCard: React.FC<TourCardProps> = ({ tour, variant = "default", showActi
       <div className="grid grid-cols-2 gap-4 mb-4 text-sm">
         <div>
           <span className="font-medium text-gray-700">{t("tours.country")}:</span>
-          <span className="ml-2">{tour.country}</span>
+          <span className="ml-2">{getCountryDisplayName(tour.country)}</span>
         </div>
         <div>
           <span className="font-medium text-gray-700">{t("tours.price")}:</span>
@@ -212,7 +226,7 @@ const TourCard: React.FC<TourCardProps> = ({ tour, variant = "default", showActi
                 disabled={buttonProps.disabled}
                 title={hasExistingRequest ? t("tours.requestAlreadyExists") : ""}
               >
-                {loading && !hasExistingRequest ? t("common.loading") : buttonProps.text}
+                {actionLoading && !hasExistingRequest ? t("common.loading") : buttonProps.text}
               </button>
               {hasExistingRequest && (
                 <p className="text-xs text-gray-500 mt-1 text-center">{t("tours.requestAlreadyExistsMessage")}</p>
@@ -221,7 +235,6 @@ const TourCard: React.FC<TourCardProps> = ({ tour, variant = "default", showActi
           )}
           {isOwner && (
             <>
-              <button className="btn btn-secondary flex-1">{t("tours.edit")}</button>
               <button onClick={handleDeleteTour} className="btn bg-red-500 text-white hover:bg-red-600">
                 {t("tours.delete")}
               </button>

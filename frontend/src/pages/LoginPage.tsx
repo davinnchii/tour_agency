@@ -15,8 +15,8 @@ const LoginPage: React.FC = () => {
   const dispatch = useAppDispatch();
 
   const [formData, setFormData] = useState({
-    email: "",
-    password: "",
+    email: "agent@example.com",
+    password: "123456",
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");

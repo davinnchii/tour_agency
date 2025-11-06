@@ -8,6 +8,7 @@ import { useAppDispatch, useAppSelector } from "@/store"
 import { registerAsync, clearError } from "../features/auth/authSlice"
 import { toastError } from "../utils/toast"
 import LanguageSwitcher from "@/components/LanguageSwitcher"
+import ThemeToggle from "@/components/ThemeToggle"
 import type { RegisterPayload } from "../types"
 
 const RegisterPage: React.FC = () => {
@@ -82,20 +83,28 @@ const RegisterPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
+    <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+      {/* Animated background elements */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-purple-300 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob"></div>
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-yellow-300 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-2000"></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-pink-300 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-4000"></div>
+      </div>
+
+      <div className="max-w-md w-full space-y-8 relative z-10 animate-fade-in">
         <div className="text-center">
-          <div className="flex justify-center mb-4">
+          <div className="flex justify-center items-center gap-3 mb-6">
+            <ThemeToggle />
             <LanguageSwitcher />
           </div>
-          <h2 className="text-3xl font-bold text-gray-900">{t("auth.register")}</h2>
-          <p className="mt-2 text-sm text-gray-600">{t("auth.registerSubtitle")}</p>
+          <h2 className="text-4xl font-extrabold text-white dark:text-gray-100 mb-2 drop-shadow-lg">{t("auth.register")}</h2>
+          <p className="mt-2 text-lg text-white/90 dark:text-gray-300 font-medium">{t("auth.registerSubtitle")}</p>
         </div>
 
-        <div className="card">
-          <form onSubmit={handleSubmit} className="space-y-4">
+        <div className="glass rounded-2xl shadow-2xl p-8 border border-white/20">
+          <form onSubmit={handleSubmit} className="space-y-5">
             <div className="field">
-              <label htmlFor="name">{t("auth.name")}</label>
+              <label htmlFor="name" className="text-gray-700">{t("auth.name")}</label>
               <input
                 id="name"
                 type="text"
@@ -104,11 +113,12 @@ const RegisterPage: React.FC = () => {
                 placeholder={t("auth.namePlaceholder")}
                 required
                 disabled={loading}
+                className="input"
               />
             </div>
 
             <div className="field">
-              <label htmlFor="email">{t("auth.email")}</label>
+              <label htmlFor="email" className="text-gray-700">{t("auth.email")}</label>
               <input
                 id="email"
                 type="email"
@@ -117,11 +127,12 @@ const RegisterPage: React.FC = () => {
                 placeholder="user@example.com"
                 required
                 disabled={loading}
+                className="input"
               />
             </div>
 
             <div className="field">
-              <label htmlFor="role">{t("auth.role")}</label>
+              <label htmlFor="role" className="text-gray-700">{t("auth.role")}</label>
               <select
                 id="role"
                 value={formData.role}
@@ -135,7 +146,7 @@ const RegisterPage: React.FC = () => {
             </div>
 
             <div className="field">
-              <label htmlFor="password">{t("auth.password")}</label>
+              <label htmlFor="password" className="text-gray-700">{t("auth.password")}</label>
               <input
                 id="password"
                 type="password"
@@ -145,11 +156,12 @@ const RegisterPage: React.FC = () => {
                 required
                 disabled={loading}
                 minLength={6}
+                className="input"
               />
             </div>
 
             <div className="field">
-              <label htmlFor="confirmPassword">{t("auth.confirmPassword")}</label>
+              <label htmlFor="confirmPassword" className="text-gray-700">{t("auth.confirmPassword")}</label>
               <input
                 id="confirmPassword"
                 type="password"
@@ -162,24 +174,50 @@ const RegisterPage: React.FC = () => {
                 required
                 disabled={loading}
                 minLength={6}
+                className="input"
               />
             </div>
 
-            <button type="submit" disabled={loading} className="btn btn-primary w-full">
-              {loading ? t("common.loading") : t("auth.register")}
+            <button type="submit" disabled={loading} className="btn btn-primary w-full text-lg py-3.5">
+              {loading ? (
+                <span className="flex items-center justify-center">
+                  <span className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></span>
+                  {t("common.loading")}
+                </span>
+              ) : (
+                t("auth.register")
+              )}
             </button>
           </form>
 
           <div className="mt-6 text-center">
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-gray-600 dark:text-gray-400">
               {t("auth.hasAccount")}{" "}
-              <Link to="/login" className="text-blue-600 hover:text-blue-500 font-medium">
+              <Link to="/login" className="text-blue-600 dark:text-green-400 hover:text-blue-700 dark:hover:text-green-300 font-semibold transition-colors underline-offset-2 hover:underline">
                 {t("auth.login")}
               </Link>
             </p>
           </div>
         </div>
       </div>
+
+      <style>{`
+        @keyframes blob {
+          0% { transform: translate(0px, 0px) scale(1); }
+          33% { transform: translate(30px, -50px) scale(1.1); }
+          66% { transform: translate(-20px, 20px) scale(0.9); }
+          100% { transform: translate(0px, 0px) scale(1); }
+        }
+        .animate-blob {
+          animation: blob 7s infinite;
+        }
+        .animation-delay-2000 {
+          animation-delay: 2s;
+        }
+        .animation-delay-4000 {
+          animation-delay: 4s;
+        }
+      `}</style>
     </div>
   )
 }

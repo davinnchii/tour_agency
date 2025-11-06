@@ -5,6 +5,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-d
 import { Provider } from "react-redux"
 import { ToastContainer } from "react-toastify"
 import { store } from "./store"
+import { ThemeProvider, useTheme } from "./contexts/ThemeContext"
 import ProtectedRoute from "./components/ProtectedRoute"
 import DashboardLayout from "@/pages/DashboardPage"
 import LoginPage from "@/pages/LoginPage"
@@ -13,54 +14,63 @@ import RegisterPage from "@/pages/RegisterPage"
 // Import react-toastify CSS
 import "react-toastify/dist/ReactToastify.css"
 
+const ToastContainerWithTheme: React.FC = () => {
+  const { theme } = useTheme()
+  return (
+    <ToastContainer
+      position="top-right"
+      autoClose={3000}
+      hideProgressBar={false}
+      newestOnTop
+      closeOnClick
+      rtl={false}
+      pauseOnFocusLoss
+      draggable
+      pauseOnHover
+      theme={theme}
+    />
+  )
+}
+
 const App: React.FC = () => {
   return (
     <Provider store={store}>
-      <Router> {/* Add basename for GitHub Pages */}
-        {/* Toast Container for notifications */}
-        <ToastContainer
-          position="top-right"
-          autoClose={3000}
-          hideProgressBar={false}
-          newestOnTop
-          closeOnClick
-          rtl={false}
-          pauseOnFocusLoss
-          draggable
-          pauseOnHover
-          theme="light"
-        />
+      <ThemeProvider>
+        <Router> {/* Add basename for GitHub Pages */}
+          {/* Toast Container for notifications */}
+          <ToastContainerWithTheme />
 
-        <Routes>
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/register" element={<RegisterPage />} />
-          <Route
-            path="/dashboard"
-            element={
-              <ProtectedRoute>
-                <DashboardLayout />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/operator"
-            element={
-              <ProtectedRoute requiredRole="operator">
-                <DashboardLayout />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/agent"
-            element={
-              <ProtectedRoute requiredRole="agent">
-                <DashboardLayout />
-              </ProtectedRoute>
-            }
-          />
-          <Route path="/" element={<Navigate to="/dashboard" replace />} />
-        </Routes>
-      </Router>
+          <Routes>
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/register" element={<RegisterPage />} />
+            <Route
+              path="/dashboard"
+              element={
+                <ProtectedRoute>
+                  <DashboardLayout />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/operator"
+              element={
+                <ProtectedRoute requiredRole="operator">
+                  <DashboardLayout />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/agent"
+              element={
+                <ProtectedRoute requiredRole="agent">
+                  <DashboardLayout />
+                </ProtectedRoute>
+              }
+            />
+            <Route path="/" element={<Navigate to="/dashboard" replace />} />
+          </Routes>
+        </Router>
+      </ThemeProvider>
     </Provider>
   )
 }

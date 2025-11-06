@@ -109,70 +109,96 @@ export const CreateTourForm: React.FC<CreateTourFormProps> = ({ onClose }) => {
   }
 
   return (
-    <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-      <div className="bg-white rounded-xl shadow-lg p-6 w-full max-w-md">
-        <h3 className="text-lg font-bold mb-4">{t("createTourForm.title")}</h3>
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          <div>
+    <div className="fixed inset-0 bg-black/60 dark:bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 animate-fade-in">
+      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-8 w-full max-w-lg border-2 border-gray-200 dark:border-gray-700 animate-slide-in">
+        <h3 className="text-2xl font-bold mb-6 gradient-text">{t("createTourForm.title")}</h3>
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+          <div className="field">
+            <label className="text-gray-700">{t("createTourForm.placeholders.title")}</label>
             <input
               type="text"
               placeholder={t("createTourForm.placeholders.title")}
               {...register("title")}
-              className="w-full border p-2 rounded"
+              className="input"
             />
-            {errors.title && <p className="text-red-500 text-sm">{errors.title.message}</p>}
+            {errors.title && <p className="error">{errors.title.message}</p>}
           </div>
 
-          <div>
+          <div className="field">
+            <label className="text-gray-700">{t("createTourForm.placeholders.description")}</label>
             <textarea
               placeholder={t("createTourForm.placeholders.description")}
               {...register("description")}
-              className="w-full border p-2 rounded"
+              className="input min-h-[100px] resize-y"
+              rows={4}
             />
-            {errors.description && <p className="text-red-500 text-sm">{errors.description.message}</p>}
+            {errors.description && <p className="error">{errors.description.message}</p>}
           </div>
 
-          <div>
+          <div className="field">
+            <label className="text-gray-700">{t("createTourForm.placeholders.country")}</label>
             <Controller
               name="country"
               control={control}
               render={({ field }) => (
-                <Select {...field} options={countryOptions} placeholder={t("createTourForm.placeholders.country")} />
+                <Select 
+                  {...field} 
+                  options={countryOptions} 
+                  placeholder={t("createTourForm.placeholders.country")}
+                  className="react-select-container"
+                  classNamePrefix="react-select"
+                />
               )}
             />
-            {errors.country && <p className="text-red-500 text-sm">{errors.country.message}</p>}
+            {errors.country && <p className="error">{errors.country.message}</p>}
           </div>
 
-          <div>
+          <div className="field">
+            <label className="text-gray-700">{t("createTourForm.placeholders.price")}</label>
             <input
               type="number"
               placeholder={t("createTourForm.placeholders.price")}
               {...register("price")}
-              className="w-full border p-2 rounded"
+              className="input"
             />
-            {errors.price && <p className="text-red-500 text-sm">{errors.price.message}</p>}
+            {errors.price && <p className="error">{errors.price.message}</p>}
           </div>
 
-          <div>
-            <input type="date" {...register("startDate")} className="w-full border p-2 rounded" />
-            {errors.startDate && <p className="text-red-500 text-sm">{errors.startDate.message}</p>}
+          <div className="grid grid-cols-2 gap-4">
+            <div className="field">
+              <label className="text-gray-700">{t("createTourForm.placeholders.startDate") || "Start Date"}</label>
+              <input type="date" {...register("startDate")} className="input" />
+              {errors.startDate && <p className="error">{errors.startDate.message}</p>}
+            </div>
+
+            <div className="field">
+              <label className="text-gray-700">{t("createTourForm.placeholders.endDate") || "End Date"}</label>
+              <input type="date" {...register("endDate")} className="input" />
+              {errors.endDate && <p className="error">{errors.endDate.message}</p>}
+            </div>
           </div>
 
-          <div>
-            <input type="date" {...register("endDate")} className="w-full border p-2 rounded" />
-            {errors.endDate && <p className="text-red-500 text-sm">{errors.endDate.message}</p>}
-          </div>
-
-          <div className="flex justify-between pt-2">
+          <div className="flex justify-end gap-3 pt-4">
+            <button 
+              type="button" 
+              className="btn btn-secondary px-6" 
+              onClick={onClose}
+            >
+              {t("createTourForm.buttons.cancel")}
+            </button>
             <button
               type="submit"
               disabled={loading}
-              className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 disabled:opacity-50"
+              className="btn bg-gradient-to-r from-green-500 to-green-600 text-white hover:from-green-600 hover:to-green-700 px-6 shadow-md"
             >
-              {loading ? t("common.loading") : t("createTourForm.buttons.create")}
-            </button>
-            <button type="button" className="bg-gray-300 px-4 py-2 rounded hover:bg-gray-400" onClick={onClose}>
-              {t("createTourForm.buttons.cancel")}
+              {loading ? (
+                <span className="flex items-center">
+                  <span className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></span>
+                  {t("common.loading")}
+                </span>
+              ) : (
+                t("createTourForm.buttons.create")
+              )}
             </button>
           </div>
         </form>

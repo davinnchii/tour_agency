@@ -134,25 +134,27 @@ const TourCard: React.FC<TourCardProps> = ({
     const buttonProps = getRequestButtonProps()
 
     return (
-      <div className="border rounded-lg p-4 hover:shadow-md transition-shadow">
+      <div className="border-2 border-gray-200 dark:border-gray-700 rounded-xl p-5 hover:shadow-xl transition-all duration-300 bg-gradient-to-br from-white to-blue-50/30 dark:from-gray-800 dark:to-gray-900/50 hover:border-blue-300 dark:hover:border-green-500">
         <div className="flex justify-between items-start">
           <div className="flex-1">
-            <h4 className="font-semibold text-lg mb-1">{tour.title}</h4>
-            <p className="text-sm text-gray-600 mb-2">{getCountryDisplayName(tour.country)}</p>
-            <p className="text-lg font-bold text-blue-600">{tour.price} грн</p>
+            <h4 className="font-bold text-xl mb-2 text-gray-900 dark:text-gray-100">{tour.title}</h4>
+            <p className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-3">{getCountryDisplayName(tour.country)}</p>
+            <p className="text-2xl font-extrabold bg-gradient-to-r from-blue-600 to-purple-600 dark:from-green-400 dark:to-green-500 bg-clip-text text-transparent">
+              {tour.price} грн
+            </p>
           </div>
           {showActions && isAgent && (
-            <div className="ml-2">
+            <div className="ml-4">
               <button
                 onClick={handleCreateRequest}
-                className={`${buttonProps.className} btn-sm`}
+                className={`${buttonProps.className} px-4 py-2 text-sm`}
                 disabled={buttonProps.disabled}
                 title={hasExistingRequest ? t("tours.requestAlreadyExists") : ""}
               >
                 {buttonProps.text}
               </button>
               {hasExistingRequest && (
-                <div className="text-xs text-gray-500 mt-1 text-center">{t(`tours.status.${requestStatus}`)}</div>
+                <div className="text-xs text-gray-500 mt-2 text-center font-medium">{t(`tours.status.${requestStatus}`)}</div>
               )}
             </div>
           )}
@@ -164,81 +166,97 @@ const TourCard: React.FC<TourCardProps> = ({
   const buttonProps = getRequestButtonProps()
 
   return (
-    <div className="card hover:shadow-lg transition-shadow">
-      <div className="flex justify-between items-start mb-3">
+    <div className="card hover:shadow-2xl transition-all duration-300 border-2 border-gray-100 dark:border-gray-700 bg-gradient-to-br from-white to-blue-50/30 dark:from-gray-800 dark:to-gray-900/50">
+      <div className="flex justify-between items-start mb-4">
         <div className="flex-1">
-          <h3 className="text-xl font-semibold mb-2">{tour.title}</h3>
-          {tour.description && <p className="text-gray-600 mb-3">{tour.description}</p>}
-        </div>
-        <div className="flex flex-col items-end gap-2">
-          {isOwner && (
-            <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded">{t("tours.yourTour")}</span>
-          )}
-          {hasExistingRequest && isAgent && (
-            <span
-              className={`text-xs px-2 py-1 rounded ${
-                requestStatus === "pending"
-                  ? "bg-yellow-100 text-yellow-800"
-                  : requestStatus === "approved"
-                    ? "bg-green-100 text-green-800"
-                    : requestStatus === "rejected"
-                      ? "bg-red-100 text-red-800"
-                      : "bg-gray-100 text-gray-800"
-              }`}
-            >
-              {t(`tours.status.${requestStatus}`)}
-            </span>
+          <div className="flex items-center gap-3 mb-2">
+            <h3 className="text-2xl font-bold text-gray-900 dark:text-gray-100">{tour.title}</h3>
+            {isOwner && (
+              <span className="bg-gradient-to-r from-green-400 to-green-500 text-white text-xs font-semibold px-3 py-1 rounded-full shadow-md">
+                {t("tours.yourTour")}
+              </span>
+            )}
+            {hasExistingRequest && isAgent && (
+              <span
+                className={`text-xs font-semibold px-3 py-1 rounded-full shadow-md ${
+                  requestStatus === "pending"
+                    ? "bg-gradient-to-r from-yellow-400 to-yellow-500 text-white"
+                    : requestStatus === "approved"
+                      ? "bg-gradient-to-r from-green-400 to-green-500 text-white"
+                      : requestStatus === "rejected"
+                        ? "bg-gradient-to-r from-red-400 to-red-500 text-white"
+                        : "bg-gradient-to-r from-gray-400 to-gray-500 text-white"
+                }`}
+              >
+                {t(`tours.status.${requestStatus}`)}
+              </span>
+            )}
+          </div>
+          {tour.description && (
+            <p className="text-gray-600 dark:text-gray-300 mb-4 leading-relaxed line-clamp-2">{tour.description}</p>
           )}
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-4 mb-4 text-sm">
-        <div>
-          <span className="font-medium text-gray-700">{t("tours.country")}:</span>
-          <span className="ml-2">{getCountryDisplayName(tour.country)}</span>
+      <div className="grid grid-cols-2 gap-4 mb-5 p-4 bg-white/60 dark:bg-gray-700/60 rounded-lg border border-gray-100 dark:border-gray-600">
+        <div className="flex flex-col">
+          <span className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">{t("tours.country")}</span>
+          <span className="text-base font-semibold text-gray-900 dark:text-gray-100">{getCountryDisplayName(tour.country)}</span>
         </div>
-        <div>
-          <span className="font-medium text-gray-700">{t("tours.price")}:</span>
-          <span className="ml-2 font-bold text-blue-600">{tour.price} грн</span>
+        <div className="flex flex-col">
+          <span className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">{t("tours.price")}</span>
+          <span className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 dark:from-green-400 dark:to-green-500 bg-clip-text text-transparent">
+            {tour.price} грн
+          </span>
         </div>
-        <div>
-          <span className="font-medium text-gray-700">{t("tours.startDate")}:</span>
-          <span className="ml-2">{formatDate(tour.startDate)}</span>
+        <div className="flex flex-col">
+          <span className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">{t("tours.startDate")}</span>
+          <span className="text-base font-medium text-gray-900 dark:text-gray-100">{formatDate(tour.startDate)}</span>
         </div>
-        <div>
-          <span className="font-medium text-gray-700">{t("tours.endDate")}:</span>
-          <span className="ml-2">{formatDate(tour.endDate)}</span>
+        <div className="flex flex-col">
+          <span className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">{t("tours.endDate")}</span>
+          <span className="text-base font-medium text-gray-900 dark:text-gray-100">{formatDate(tour.endDate)}</span>
         </div>
       </div>
 
-      <div className="mb-4 text-sm">
-        <span className="font-medium text-gray-700">{t("tours.operator")}:</span>
-        <span className="ml-2">{operatorName}</span>
+      <div className="mb-5 p-3 bg-gradient-to-r from-purple-50 to-blue-50 dark:from-green-900/30 dark:to-green-800/20 rounded-lg border border-purple-100 dark:border-green-700/50">
+        <div className="flex items-center gap-2">
+          <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">{t("tours.operator")}:</span>
+          <span className="text-base font-bold text-purple-700 dark:text-green-400">{operatorName}</span>
+        </div>
       </div>
 
       {showActions && (
-        <div className="flex gap-2 pt-3 border-t">
+        <div className="flex gap-3 pt-4 border-t-2 border-gray-200 dark:border-gray-700">
           {isAgent && (
             <div className="flex-1">
               <button
                 onClick={handleCreateRequest}
-                className={buttonProps.className}
+                className={`${buttonProps.className} w-full`}
                 disabled={buttonProps.disabled}
                 title={hasExistingRequest ? t("tours.requestAlreadyExists") : ""}
               >
-                {actionLoading && !hasExistingRequest ? t("common.loading") : buttonProps.text}
+                {actionLoading && !hasExistingRequest ? (
+                  <span className="flex items-center justify-center">
+                    <span className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></span>
+                    {t("common.loading")}
+                  </span>
+                ) : (
+                  buttonProps.text
+                )}
               </button>
               {hasExistingRequest && (
-                <p className="text-xs text-gray-500 mt-1 text-center">{t("tours.requestAlreadyExistsMessage")}</p>
+                <p className="text-xs text-gray-500 mt-2 text-center font-medium">{t("tours.requestAlreadyExistsMessage")}</p>
               )}
             </div>
           )}
           {isOwner && (
-            <>
-              <button onClick={handleDeleteTour} className="btn bg-red-500 text-white hover:bg-red-600">
-                {t("tours.delete")}
-              </button>
-            </>
+            <button 
+              onClick={handleDeleteTour} 
+              className="btn bg-gradient-to-r from-red-500 to-red-600 text-white hover:from-red-600 hover:to-red-700 shadow-md px-6"
+            >
+              {t("tours.delete")}
+            </button>
           )}
         </div>
       )}

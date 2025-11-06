@@ -115,19 +115,19 @@ const TourSearch: React.FC<TourSearchProps> = ({ onSearchResults }) => {
   }
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border p-6 mb-6">
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-semibold">{t("search.title")}</h3>
-        <div className="flex items-center gap-2">
+    <div className="card mb-6 bg-gradient-to-br from-white to-blue-50/30 dark:from-gray-800 dark:to-gray-900/50 border-2 border-gray-200 dark:border-gray-700">
+      <div className="flex items-center justify-between mb-6">
+        <h3 className="text-2xl font-bold gradient-text">{t("search.title")}</h3>
+        <div className="flex items-center gap-3">
           {isSearchActive && (
-            <span className="text-sm text-green-600 bg-green-50 px-2 py-1 rounded">
+            <span className="text-sm font-semibold text-green-700 dark:text-green-300 bg-gradient-to-r from-green-100 to-green-50 dark:from-green-900/30 dark:to-green-800/20 px-4 py-2 rounded-full border-2 border-green-200 dark:border-green-700 shadow-sm">
               {t("search.activeSearch", { count: searchResults.length })}
             </span>
           )}
           <button
             type="button"
             onClick={() => setShowAdvanced(!showAdvanced)}
-            className="text-sm text-blue-600 hover:text-blue-800"
+            className="text-sm font-semibold text-blue-600 dark:text-green-400 hover:text-blue-700 dark:hover:text-green-300 bg-blue-50 dark:bg-green-900/20 px-4 py-2 rounded-lg border border-blue-200 dark:border-green-700 hover:bg-blue-100 dark:hover:bg-green-900/30 transition-all duration-200"
           >
             {showAdvanced ? t("search.hideAdvanced") : t("search.showAdvanced")}
           </button>
@@ -135,24 +135,31 @@ const TourSearch: React.FC<TourSearchProps> = ({ onSearchResults }) => {
       </div>
 
       {/* Quick Search */}
-      <form onSubmit={handleQuickSearch} className="mb-4">
-        <div className="flex gap-2">
+      <form onSubmit={handleQuickSearch} className="mb-6">
+        <div className="flex gap-3">
           <input
             type="text"
             placeholder={t("search.placeholders.quickSearch")}
             value={searchParams.search || ""}
             onChange={(e) => handleInputChange("search", e.target.value)}
-            className="input flex-1"
+            className="input flex-1 text-base"
           />
-          <button type="submit" disabled={searchLoading} className="btn btn-primary px-6">
-            {searchLoading ? t("common.searching") : t("search.search")}
+          <button type="submit" disabled={searchLoading} className="btn btn-primary px-8 text-base">
+            {searchLoading ? (
+              <span className="flex items-center">
+                <span className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></span>
+                {t("common.searching")}
+              </span>
+            ) : (
+              t("search.search")
+            )}
           </button>
         </div>
       </form>
 
       {/* Advanced Search */}
       {showAdvanced && (
-        <div className="border-t pt-4">
+        <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
             {/* Country Filter */}
             <div className="field">
@@ -247,7 +254,14 @@ const TourSearch: React.FC<TourSearchProps> = ({ onSearchResults }) => {
           {/* Search Actions */}
           <div className="flex gap-3">
             <button type="button" onClick={() => handleSearch()} disabled={searchLoading} className="btn btn-primary">
-              {searchLoading ? t("common.searching") : t("search.applyFilters")}
+              {searchLoading ? (
+                <span className="flex items-center">
+                  <span className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></span>
+                  {t("common.searching")}
+                </span>
+              ) : (
+                t("search.applyFilters")
+              )}
             </button>
             <button type="button" onClick={handleClearSearch} className="btn btn-secondary">
               {t("search.clearFilters")}
@@ -258,8 +272,8 @@ const TourSearch: React.FC<TourSearchProps> = ({ onSearchResults }) => {
 
       {/* Search Results Summary */}
       {isSearchActive && (
-        <div className="mt-4 pt-4 border-t">
-          <div className="flex items-center justify-between text-sm text-gray-600">
+        <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+          <div className="flex items-center justify-between text-sm text-gray-600 dark:text-gray-400">
             <span>
               {t("search.resultsFound", {
                 count: searchPagination.total,
@@ -272,17 +286,17 @@ const TourSearch: React.FC<TourSearchProps> = ({ onSearchResults }) => {
                 <button
                   onClick={() => handlePageChange(searchPagination.page - 1)}
                   disabled={searchPagination.page === 1 || searchLoading}
-                  className="px-2 py-1 rounded bg-gray-100 hover:bg-gray-200 disabled:opacity-50"
+                  className="px-4 py-2 rounded-lg bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 hover:border-blue-500 dark:hover:border-green-500 hover:bg-blue-50 dark:hover:bg-green-900/20 disabled:opacity-50 disabled:cursor-not-allowed font-semibold transition-all duration-200 text-gray-900 dark:text-gray-100"
                 >
                   ←
                 </button>
-                <span>
+                <span className="px-4 py-2 bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-lg font-semibold text-gray-900 dark:text-gray-100">
                   {searchPagination.page} / {searchPagination.totalPages}
                 </span>
                 <button
                   onClick={() => handlePageChange(searchPagination.page + 1)}
                   disabled={searchPagination.page === searchPagination.totalPages || searchLoading}
-                  className="px-2 py-1 rounded bg-gray-100 hover:bg-gray-200 disabled:opacity-50"
+                  className="px-4 py-2 rounded-lg bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 hover:border-blue-500 dark:hover:border-green-500 hover:bg-blue-50 dark:hover:bg-green-900/20 disabled:opacity-50 disabled:cursor-not-allowed font-semibold transition-all duration-200 text-gray-900 dark:text-gray-100"
                 >
                   →
                 </button>

@@ -9,31 +9,14 @@ const LanguageSwitcher = () => {
   };
 
   return (
-    <div
-      style={{
-        position: 'fixed',
-        bottom: 20,
-        right: 20,
-        backgroundColor: '#fff',
-        border: '1px solid #ccc',
-        borderRadius: 8,
-        padding: '8px 12px',
-        boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-        zIndex: 1000,
-      }}
-    >
+    <div className="fixed bottom-6 right-6 bg-white/90 dark:bg-gray-800/90 backdrop-blur-md border-2 border-gray-200 dark:border-gray-700 rounded-xl px-4 py-2 shadow-lg z-50 hover:shadow-xl transition-all duration-200">
       <select
         value={i18n.language}
         onChange={(e) => changeLanguage(e.target.value)}
-        style={{
-          border: 'none',
-          background: 'transparent',
-          cursor: 'pointer',
-          fontSize: 14,
-        }}
+        className="border-none bg-transparent cursor-pointer text-sm font-semibold text-gray-700 dark:text-gray-300 focus:outline-none"
       >
-        <option value="en">English</option>
-        <option value="ua">Українська</option>
+        <option value="en">🇬🇧 English</option>
+        <option value="ua">🇺🇦 Українська</option>
       </select>
     </div>
   );

@@ -75,39 +75,44 @@ const OperatorDashboard: React.FC = React.memo(() => {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 animate-fade-in">
       {/* Navigation Tabs */}
-      <div className="border-b">
-        <nav className="flex space-x-8">
+      <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl shadow-md border border-gray-200 dark:border-gray-700 p-2 transition-colors duration-300">
+        <nav className="flex space-x-2">
           <button
             onClick={() => setActiveTab("tours")}
-            className={`py-2 px-1 border-b-2 font-medium text-sm ${
+            className={`py-3 px-6 rounded-lg font-semibold text-sm transition-all duration-200 ${
               activeTab === "tours"
-                ? "border-blue-500 text-blue-600"
-                : "border-transparent text-gray-500 hover:text-gray-700"
+                ? "bg-gradient-to-r from-blue-600 to-blue-700 dark:from-green-500 dark:to-green-600 text-white shadow-lg transform scale-105"
+                : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
             }`}
           >
             {t("operatorDashboard.allTours")}
           </button>
           <button
             onClick={() => setActiveTab("create")}
-            className={`py-2 px-1 border-b-2 font-medium text-sm ${
+            className={`py-3 px-6 rounded-lg font-semibold text-sm transition-all duration-200 ${
               activeTab === "create"
-                ? "border-blue-500 text-blue-600"
-                : "border-transparent text-gray-500 hover:text-gray-700"
+                ? "bg-gradient-to-r from-blue-600 to-blue-700 dark:from-green-500 dark:to-green-600 text-white shadow-lg transform scale-105"
+                : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
             }`}
           >
             {t("operatorDashboard.createTour")}
           </button>
           <button
             onClick={handleRequestsTabClick}
-            className={`py-2 px-1 border-b-2 font-medium text-sm ${
+            className={`py-3 px-6 rounded-lg font-semibold text-sm transition-all duration-200 relative ${
               activeTab === "requests"
-                ? "border-blue-500 text-blue-600"
-                : "border-transparent text-gray-500 hover:text-gray-700"
+                ? "bg-gradient-to-r from-blue-600 to-blue-700 dark:from-green-500 dark:to-green-600 text-white shadow-lg transform scale-105"
+                : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
             }`}
           >
-            {t("operatorDashboard.requests")} ({operatorRequests.length})
+            {t("operatorDashboard.requests")}
+            <span className={`ml-2 px-2 py-0.5 rounded-full text-xs font-bold ${
+              activeTab === "requests" ? "bg-white/30" : "bg-blue-100 dark:bg-green-900/50 text-blue-700 dark:text-green-300"
+            }`}>
+              {operatorRequests.length}
+            </span>
           </button>
         </nav>
       </div>
@@ -117,7 +122,7 @@ const OperatorDashboard: React.FC = React.memo(() => {
 
       {activeTab === "create" && (
         <div className="max-w-2xl">
-          <h3 className="text-lg font-semibold mb-4">{t("operatorDashboard.createNewTour")}</h3>
+          <h3 className="text-2xl font-bold mb-6 gradient-text">{t("operatorDashboard.createNewTour")}</h3>
           <CreateTourForm onClose={handleTourCreated} />
         </div>
       )}
@@ -148,7 +153,7 @@ const OperatorRequestsList = React.memo<{
       <h3 className="text-lg font-semibold mb-4">{t("operatorDashboard.requestsOnTours")}</h3>
       {requests.length === 0 ? (
         <div className="text-center py-8">
-          <p className="text-gray-600">{t("operatorDashboard.noRequests")}</p>
+          <p className="text-gray-600 dark:text-gray-400">{t("operatorDashboard.noRequests")}</p>
         </div>
       ) : (
         <div className="space-y-4">
@@ -177,48 +182,50 @@ const RequestCard = React.memo<{
   const { t } = useTranslation()
 
   return (
-    <div className="card">
+    <div className="card bg-gradient-to-br from-white to-blue-50/30 dark:from-gray-800 dark:to-gray-900/50 border-2 border-gray-200 dark:border-gray-700 hover:border-blue-300 dark:hover:border-green-500">
       <div className="flex justify-between items-start">
         <div className="flex-1">
-          <h4 className="font-semibold text-lg mb-2">{request.tour.title}</h4>
-          <div className="grid grid-cols-2 gap-4 text-sm">
-            <div>
-              <span className="font-medium">{t("operatorDashboard.client")}:</span>
-              <span className="ml-2">{request.customerName}</span>
+          <h4 className="font-bold text-xl mb-4 text-gray-900 dark:text-gray-100">{request.tour.title}</h4>
+          <div className="grid grid-cols-2 gap-4 mb-4 p-4 bg-white/60 dark:bg-gray-700/60 rounded-lg border border-gray-100 dark:border-gray-600">
+            <div className="flex flex-col">
+              <span className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">{t("operatorDashboard.client")}</span>
+              <span className="text-base font-semibold text-gray-900 dark:text-gray-100">{request.customerName}</span>
             </div>
-            <div>
-              <span className="font-medium">{t("operatorDashboard.email")}:</span>
-              <span className="ml-2">{request.customerEmail}</span>
+            <div className="flex flex-col">
+              <span className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">{t("operatorDashboard.email")}</span>
+              <span className="text-base font-medium text-gray-700 dark:text-gray-300">{request.customerEmail}</span>
             </div>
-            <div>
-              <span className="font-medium">{t("requests.status")}:</span>
+            <div className="flex flex-col">
+              <span className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">{t("requests.status")}</span>
               <span
-                className={`ml-2 px-2 py-1 rounded text-xs ${
+                className={`px-3 py-1 rounded-full text-xs font-bold w-fit ${
                   request.status === "pending"
-                    ? "bg-yellow-100 text-yellow-800"
+                    ? "bg-gradient-to-r from-yellow-400 to-yellow-500 text-white"
                     : request.status === "approved"
-                      ? "bg-green-100 text-green-800"
-                      : "bg-red-100 text-red-800"
+                      ? "bg-gradient-to-r from-green-400 to-green-500 text-white"
+                      : "bg-gradient-to-r from-red-400 to-red-500 text-white"
                 }`}
               >
                 {t(`requests.status.${request.status}`)}
               </span>
             </div>
-            <div>
-              <span className="font-medium">{t("tours.price")}:</span>
-              <span className="ml-2 font-bold text-blue-600">{request.tour.price} грн</span>
+            <div className="flex flex-col">
+              <span className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">{t("tours.price")}</span>
+              <span className="text-lg font-bold bg-gradient-to-r from-blue-600 to-purple-600 dark:from-green-400 dark:to-green-500 bg-clip-text text-transparent">
+                {request.tour.price} грн
+              </span>
             </div>
           </div>
 
           {/* Status update buttons */}
-          <div className="mt-4 flex gap-2">
+          <div className="mt-4 flex gap-2 flex-wrap">
             <button
               onClick={() => onUpdateStatus(request._id, "approved")}
               disabled={request.status === "approved" || actionLoading}
-              className={`px-3 py-1 text-sm rounded ${
+              className={`px-4 py-2 text-sm font-semibold rounded-lg transition-all duration-200 ${
                 request.status === "approved"
                   ? "bg-gray-200 text-gray-500 cursor-not-allowed"
-                  : "bg-green-500 text-white hover:bg-green-600"
+                  : "bg-gradient-to-r from-green-500 to-green-600 text-white hover:from-green-600 hover:to-green-700 shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
               }`}
             >
               {t("requests.approve")}
@@ -226,10 +233,10 @@ const RequestCard = React.memo<{
             <button
               onClick={() => onUpdateStatus(request._id, "rejected")}
               disabled={request.status === "rejected" || actionLoading}
-              className={`px-3 py-1 text-sm rounded ${
+              className={`px-4 py-2 text-sm font-semibold rounded-lg transition-all duration-200 ${
                 request.status === "rejected"
                   ? "bg-gray-200 text-gray-500 cursor-not-allowed"
-                  : "bg-red-500 text-white hover:bg-red-600"
+                  : "bg-gradient-to-r from-red-500 to-red-600 text-white hover:from-red-600 hover:to-red-700 shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
               }`}
             >
               {t("requests.reject")}
@@ -237,10 +244,10 @@ const RequestCard = React.memo<{
             <button
               onClick={() => onUpdateStatus(request._id, "pending")}
               disabled={request.status === "pending" || actionLoading}
-              className={`px-3 py-1 text-sm rounded ${
+              className={`px-4 py-2 text-sm font-semibold rounded-lg transition-all duration-200 ${
                 request.status === "pending"
                   ? "bg-gray-200 text-gray-500 cursor-not-allowed"
-                  : "bg-yellow-500 text-white hover:bg-yellow-600"
+                  : "bg-gradient-to-r from-yellow-500 to-yellow-600 text-white hover:from-yellow-600 hover:to-yellow-700 shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
               }`}
             >
               {t("requests.markPending")}
@@ -250,9 +257,16 @@ const RequestCard = React.memo<{
         <button
           onClick={() => onDelete(request._id)}
           disabled={actionLoading}
-          className="btn bg-red-500 text-white hover:bg-red-600 ml-4 disabled:opacity-50"
+          className="btn bg-gradient-to-r from-red-500 to-red-600 text-white hover:from-red-600 hover:to-red-700 ml-4 disabled:opacity-50 shadow-md"
         >
-          {actionLoading ? t("common.loading") : t("operatorDashboard.delete")}
+          {actionLoading ? (
+            <span className="flex items-center">
+              <span className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></span>
+              {t("common.loading")}
+            </span>
+          ) : (
+            t("operatorDashboard.delete")
+          )}
         </button>
       </div>
     </div>

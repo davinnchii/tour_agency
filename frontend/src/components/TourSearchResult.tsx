@@ -53,21 +53,21 @@ const TourSearchResults: React.FC = React.memo(() => {
       <TourSearch onSearchResults={setHasSearchResults} />
 
       {isSearchActive && (
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-          <h4 className="font-medium text-blue-900 mb-1">{t("search.resultsTitle")}</h4>
-          <p className="text-blue-700 text-sm">
+        <div className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-green-900/30 dark:to-green-800/20 border-2 border-blue-200 dark:border-green-700 rounded-xl p-5 shadow-sm">
+          <h4 className="font-bold text-blue-900 dark:text-green-300 mb-2 text-lg">{t("search.resultsTitle")}</h4>
+          <p className="text-blue-700 dark:text-green-400 font-semibold">
             {displayTours.length > 0 ? t("search.resultsCount", { count: displayTours.length }) : t("search.noResults")}
           </p>
         </div>
       )}
 
       {displayTours.length === 0 && !searchLoading ? (
-        <div className="text-center py-12">
-          <div className="text-gray-400 text-6xl mb-4">🔍</div>
-          <h3 className="text-lg font-medium text-gray-900 mb-2">
+        <div className="text-center py-16 bg-white/60 dark:bg-gray-800/60 rounded-xl border-2 border-gray-200 dark:border-gray-700">
+          <div className="text-6xl mb-6">🔍</div>
+          <h3 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-3">
             {isSearchActive ? t("search.noResults") : t("tours.noTours")}
           </h3>
-          <p className="text-gray-600">
+          <p className="text-gray-600 dark:text-gray-400 text-lg">
             {isSearchActive ? t("search.tryDifferentFilters") : t("tours.noToursDescription")}
           </p>
         </div>
